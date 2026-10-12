@@ -169,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation Section */}
-        <div className="flex-1 px-3 py-2 overflow-y-auto space-y-6">
+        <div className="flex-1 px-3 py-2 overflow-y-auto space-y-6 custom-scrollbar">
           {/* Section 1: Danh mục Thẻ Nguyên Tử */}
           <div>
             <div className="px-3 mb-2 flex items-center justify-between text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
