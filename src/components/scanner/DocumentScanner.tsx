@@ -481,13 +481,13 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
 
           <div>
             <h1 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2">
-              Quét & Số Hóa Tài Liệu
-              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-brand-100 dark:bg-brand-950/70 text-brand-700 dark:text-brand-300 border border-brand-200/60 dark:border-brand-800/60">
-                AI Vision + OCR
+              Quét Tài Liệu
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/60 dark:border-slate-700">
+                OCR
               </span>
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Trích xuất chữ in, chữ viết tay, công thức KaTeX và mã nguồn — bảo toàn 100% bố cục
+              Trích xuất văn bản từ hình ảnh
             </p>
           </div>
         </div>
@@ -505,7 +505,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
               }`}
             >
               <Cpu className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
-              <span>Machine Learning (ML Offline)</span>
+              <span>Offline OCR</span>
             </button>
             <button
               onClick={() => handleChangeEngine('gemini')}
@@ -516,7 +516,7 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
               }`}
             >
               <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-              <span>Cloud AI (Gemini)</span>
+              <span>Cloud AI</span>
             </button>
           </div>
 

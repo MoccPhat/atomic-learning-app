@@ -81,7 +81,7 @@ html.contrast-strong section {
   input,
   select,
   textarea {
-    font-family: "Times New Roman", Times, serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   body {

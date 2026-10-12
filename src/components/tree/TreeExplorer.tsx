@@ -449,15 +449,11 @@ export const TreeExplorer: React.FC<TreeExplorerProps> = ({
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200/80 dark:border-slate-800 mb-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 text-[11px] font-bold uppercase tracking-wider mb-1.5">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Study Vault & Tree Explorer</span>
-          </div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">
-            Cây Lưu Trữ Nội Dung Học Tập
+            Tài Liệu Học Tập
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-            Phân cấp theo Khối ngành ➔ Môn học ➔ Tuần ➔ Tự động gom folder theo đuôi file (.docx, .ipynb, .pdf, .py).
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+            Quản lý tài liệu theo cây thư mục môn học
           </p>
         </div>
 

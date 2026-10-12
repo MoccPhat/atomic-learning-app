@@ -157,15 +157,15 @@ export const StudyAdvisor: React.FC<StudyAdvisorProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                  Trợ Lý Lộ Trình & Nhắc Nhở Thông Minh
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                  Trợ Lý Lộ Trình
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-wider uppercase bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">
-                  Smart Advisor
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-300 dark:border-blue-800">
+                  Advisor
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Phân tích dữ liệu từ Heatmap, Deadline & SRS để tối ưu hóa thứ tự học tập và đảm bảo không môn học nào bị bỏ quên.
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Gợi ý thứ tự học và theo dõi tiến độ
               </p>
             </div>
           </div>

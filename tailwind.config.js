@@ -8,8 +8,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Times New Roman"', 'Times', 'serif'],
-        serif: ['"Times New Roman"', 'Times', 'serif'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
       },
       colors: {
         brand: {

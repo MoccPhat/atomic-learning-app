@@ -7,7 +7,6 @@ import {
   Play,
   RotateCcw,
   Trash2,
-  Sparkles,
   HelpCircle,
   X,
   Clock,
@@ -110,15 +109,11 @@ export const QuizListView: React.FC<QuizListViewProps> = ({
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200/80 dark:border-slate-800 mb-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 text-[11px] font-bold uppercase tracking-wider mb-1.5">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Quiz Master</span>
-          </div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">
-            Luyện Thi Trắc Nghiệm
+            Thi Trắc Nghiệm
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-            Nạp đề thi Markdown, làm bài phản xạ ngay, tự động giải thích và gom câu sai để ôn lại.
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+            Luyện tập đề thi và câu hỏi trắc nghiệm
           </p>
         </div>
 

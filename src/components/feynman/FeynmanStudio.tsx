@@ -108,15 +108,12 @@ export const FeynmanStudio: React.FC<FeynmanStudioProps> = ({
           )}
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
-                Feynman Technique
-              </span>
               <h2 className="text-lg sm:text-xl font-black text-slate-800 dark:text-slate-100">
-                Feynman Socratic Coach
+                Phản Biện Feynman
               </h2>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Giải thích khái niệm phức tạp bằng ngôn từ đơn giản nhất để xóa bỏ ảo tưởng hiểu biết.
+              Diễn giải khái niệm bằng từ ngữ đơn giản
             </p>
           </div>
         </div>

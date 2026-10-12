@@ -145,14 +145,11 @@ export const CheatSheetVault: React.FC<CheatSheetVaultProps> = ({ onToggleSideba
           <div>
             <div className="flex items-center gap-2">
               <h2 className="font-extrabold text-slate-900 dark:text-slate-100 text-lg sm:text-xl">
-                Sổ Tay Tra Cứu Công Thức Bỏ Túi
+                Sổ Tay Tra Cứu
               </h2>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300">
-                Cheat Sheet Vault
-              </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Tra cứu tức thì lệnh Git khẩn cấp, truy vấn SQL, đạo hàm, cấu trúc ngữ pháp và regex với 1-chạm sao chép
+              Bảng tra cứu cú pháp và công thức
             </p>
           </div>
         </div>

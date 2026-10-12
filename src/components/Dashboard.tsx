@@ -11,7 +11,6 @@ import {
   Clock,
   Menu,
   X,
-  Check,
   ScanText,
   FileText,
   Compass,
@@ -25,10 +24,20 @@ import {
   Globe,
   BookOpen,
   Award,
+  BookMarked,
+  BrainCircuit,
+  Zap,
+  ChevronRight,
+  GraduationCap,
+  FolderTree,
+  Lightbulb,
+  Bookmark,
+  CheckCircle2,
 } from 'lucide-react';
 import { Card, Category, UserStats } from '../lib/types';
-import { isCardDue, filterDueCards, getDueCountsByCategory } from '../lib/srs-engine';
+import { isCardDue, getDueCountsByCategory } from '../lib/srs-engine';
 import { deleteCard, deleteCardsByCategory } from '../lib/storage';
+import { countTotalFilesInTree } from '../lib/tree-storage';
 import { StudyHeatmap } from './analytics/StudyHeatmap';
 import { DeadlineManager } from './deadlines/DeadlineManager';
 import { DeleteCategoryModal } from './categories/DeleteCategoryModal';
@@ -75,6 +84,7 @@ const REVIEW_CATEGORIES: {
   icon: React.ReactNode;
   bgClass: string;
   textClass: string;
+  gradientClass: string;
 }[] = [
   {
     key: 'code',
@@ -82,6 +92,7 @@ const REVIEW_CATEGORIES: {
     icon: <Code className="w-4 h-4" />,
     bgClass: 'bg-indigo-500/20',
     textClass: 'text-indigo-400',
+    gradientClass: 'from-indigo-500/20 to-purple-500/10 border-indigo-500/30',
   },
   {
     key: 'english',
@@ -89,13 +100,7 @@ const REVIEW_CATEGORIES: {
     icon: <Globe className="w-4 h-4" />,
     bgClass: 'bg-sky-500/20',
     textClass: 'text-sky-400',
-  },
-  {
-    key: 'exam',
-    label: 'Ôn thi chứng chỉ',
-    icon: <Award className="w-4 h-4" />,
-    bgClass: 'bg-amber-500/20',
-    textClass: 'text-amber-400',
+    gradientClass: 'from-sky-500/20 to-blue-500/10 border-sky-500/30',
   },
   {
     key: 'book',
@@ -103,6 +108,15 @@ const REVIEW_CATEGORIES: {
     icon: <BookOpen className="w-4 h-4" />,
     bgClass: 'bg-emerald-500/20',
     textClass: 'text-emerald-400',
+    gradientClass: 'from-emerald-500/20 to-teal-500/10 border-emerald-500/30',
+  },
+  {
+    key: 'exam',
+    label: 'Ôn thi',
+    icon: <Award className="w-4 h-4" />,
+    bgClass: 'bg-amber-500/20',
+    textClass: 'text-amber-400',
+    gradientClass: 'from-amber-500/20 to-orange-500/10 border-amber-500/30',
   },
 ];
 
@@ -132,13 +146,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [previewCard, setPreviewCard] = useState<Card | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState(false);
 
-  const dueCards = useMemo(() => filterDueCards(cards), [cards]);
+  // Tính số lượng thẻ đến hạn theo danh mục (SRS SM-2)
   const dueCounts = useMemo(() => getDueCountsByCategory(cards), [cards]);
+  const dueCards = useMemo(() => cards.filter((c) => isCardDue(c)), [cards]);
 
-  const categoryTotals = useMemo<Record<Category | 'all', number>>(() => {
+  const categoryTotals = useMemo(() => {
     return {
       all: cards.length,
       code: cards.filter((c) => c.category === 'code').length,
@@ -148,191 +162,118 @@ export const Dashboard: React.FC<DashboardProps> = ({
     };
   }, [cards]);
 
-  const filteredCards = cards.filter((card) => {
-    const matchesCategory = selectedCategory === 'all' || card.category === selectedCategory;
-    const matchesSearch =
-      card.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      card.front.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      card.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
+  // Bộ lọc tìm kiếm và danh mục
+  const filteredCards = useMemo(() => {
+    return cards.filter((card) => {
+      const matchCategory = selectedCategory === 'all' || card.category === selectedCategory;
+      const matchSearch =
+        searchQuery.trim() === '' ||
+        card.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.front.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchCategory && matchSearch;
+    });
+  }, [cards, selectedCategory, searchQuery]);
 
-  const handleDelete = (cardId: string, e: React.MouseEvent) => {
+  const handleDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const targetCard = cards.find((c) => c.id === cardId);
-    const cardTitle = targetCard?.title || 'thẻ kiến thức';
-    deleteCard(cardId);
-    onCardDeleted(cardId);
-    setToastMessage(`Đã xóa thẻ "${cardTitle}" thành công!`);
-    setTimeout(() => setToastMessage(null), 3500);
+    if (window.confirm('Bạn có chắc chắn muốn xóa thẻ kiến thức này?')) {
+      deleteCard(id);
+      onCardDeleted(id);
+    }
   };
 
   const handleQuickDeleteCurrentCategory = () => {
     if (selectedCategory === 'all') return;
+    const count = categoryTotals[selectedCategory];
+    if (count === 0) return;
     const catName = CATEGORY_NAMES[selectedCategory];
-    const count = deleteCardsByCategory(selectedCategory);
-    onCardDeleted();
-    setToastMessage(`Đã xóa toàn bộ ${count} thẻ thuộc danh mục "${catName}" thành công!`);
-    setTimeout(() => setToastMessage(null), 3500);
+    if (window.confirm(`Bạn có chắc muốn xóa tất cả ${count} thẻ trong danh mục "${catName}" không?`)) {
+      deleteCardsByCategory(selectedCategory);
+      onCardDeleted();
+    }
   };
 
-  const handleBatchDeleted = (message: string) => {
+  const handleBatchDeleted = () => {
     onCardDeleted();
-    setToastMessage(message);
-    setTimeout(() => setToastMessage(null), 3500);
   };
 
   return (
-    <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 py-6 text-left">
-      {/* Toast Notification khi xóa thành công */}
-      {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 p-3.5 px-4 rounded-2xl bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold shadow-2xl border border-slate-700 flex items-center gap-2.5 animate-bounce">
-          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
-      {/* Top Navbar */}
-      <header className="flex items-center justify-between pb-5 border-b border-slate-200/80 dark:border-slate-800 mb-6">
+    <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 py-5 select-none animate-fade-in space-y-7">
+      {/* 1. TOP HEADER: Glassmorphic Floating Header (Heptabase + RemNote Style) */}
+      <header className="sticky top-2 z-30 flex items-center justify-between px-4 sm:px-6 py-3 rounded-2xl bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
         <div className="flex items-center gap-3">
-          {/* Nút Ẩn / Hiện Menu bên trái */}
           <button
             onClick={onToggleSidebar}
-            className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+            className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
             title="Ẩn / Hiện menu danh mục"
           >
-            <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
-            <span className="text-xs font-bold hidden sm:inline text-slate-700 dark:text-slate-200">Menu</span>
+            <Menu className="w-5 h-5" />
+            <span className="text-xs font-bold hidden sm:inline">Không Gian</span>
           </button>
 
           <div className="flex items-center gap-2.5">
-            <KaiLogo size={36} />
+            <KaiLogo size={34} />
             <div>
-              <h1 className="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight flex items-center gap-1.5">
-                Auto Learning
-                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 uppercase tracking-widest font-mono">
-                  KAI
+              <div className="flex items-center gap-1.5">
+                <h1 className="text-sm sm:text-base font-black text-slate-800 dark:text-slate-100 tracking-tight">
+                  Auto Learning
+                </h1>
+                <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-gradient-to-r from-brand-500 to-indigo-500 text-white uppercase tracking-wider font-mono">
+                  WORKSPACE
                 </span>
-              </h1>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium hidden sm:block">Hệ thống học tập thông minh</p>
+              </div>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold hidden md:block">
+                RemNote • Heptabase • Brilliant Converged
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          {/* Streak & Achievements Badge */}
+        {/* Thanh công cụ hành động nhanh */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Streak & Achievements Badge (Brilliant Gamification) */}
           <button
             onClick={onOpenAchievements}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs font-black shadow-xs hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-amber-200/80 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs font-black shadow-xs hover:border-amber-400 transition-all active:scale-95"
             title="Xem Cột Mốc Thành Tựu & Huy Hiệu Vinh Danh"
           >
-            <Flame className="w-4 h-4 fill-amber-500 text-amber-500 animate-bounce" />
+            <Flame className="w-4 h-4 fill-amber-500 text-amber-500 animate-pulse" />
             <span>{stats.streak} ngày</span>
-            <Trophy className="w-3.5 h-3.5 text-amber-500 ml-0.5" />
+            <Trophy className="w-3.5 h-3.5 text-amber-500 ml-0.5 hidden sm:inline" />
           </button>
 
-          {/* Quick Capture Button */}
+          {/* Quick Capture Button (RemNote Fast Capture) */}
           <button
             onClick={onOpenQuickCapture}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition-all"
-            title="Thêm thẻ kiến thức mới (Ctrl + Enter)"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-500 hover:to-emerald-500 active:scale-95 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition-all"
+            title="Thêm thẻ kiến thức mới (Ctrl + K / Ctrl + Enter)"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Thêm thẻ</span>
           </button>
 
-          {/* Scanner AI Button */}
-          {onOpenScanner && (
-            <button
-              onClick={onOpenScanner}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs shadow-xs hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-all active:scale-95"
-              title="Quét & số hóa tài liệu ảnh với AI Vision"
-            >
-              <ScanText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span className="hidden sm:inline">Quét tài liệu</span>
-            </button>
-          )}
-
-          {/* Pomodoro Focus Button */}
-          {onOpenPomodoro && (
-            <button
-              onClick={onOpenPomodoro}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200/80 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs shadow-xs hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-all active:scale-95"
-              title="Đồng hồ Pomodoro & Âm thanh tập trung"
-            >
-              <Clock className="w-3.5 h-3.5 text-rose-500" />
-              <span className="hidden sm:inline">Pomodoro</span>
-            </button>
-          )}
-
-          {/* Cornell Notes Quick Button */}
-          {onOpenCornell && (
-            <button
-              onClick={onOpenCornell}
-              className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-900/60 text-amber-700 dark:text-amber-300 font-bold text-xs shadow-xs hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all active:scale-95"
-              title="Trình Ghi Chú Chuẩn Cornell (3 Vùng)"
-            >
-              <FileText className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-              <span className="hidden sm:inline">Ghi chú Cornell</span>
-            </button>
-          )}
-
-          {/* Study Advisor Quick Button */}
-          {onOpenAdvisor && (
-            <button
-              onClick={onOpenAdvisor}
-              className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-xs shadow-xs hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all active:scale-95"
-              title="Trợ Lý Lộ Trình & Nhắc Nhở Học Tập Thông Minh"
-            >
-              <Compass className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              <span className="hidden sm:inline">Lộ trình</span>
-            </button>
-          )}
-
-          {/* Mindmap Quick Button */}
-          {onOpenMindmap && (
-            <button
-              onClick={onOpenMindmap}
-              className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs shadow-xs hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-all active:scale-95"
-              title="Sơ Đồ Tư Duy Trực Quan (Mindmap)"
-            >
-              <Network className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span className="hidden sm:inline">Mindmap</span>
-            </button>
-          )}
-
-          {/* Sổ Tay Lỗi Sai Button */}
-          {onOpenMistakes && (
-            <button
-              onClick={onOpenMistakes}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200/80 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs shadow-xs hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-all active:scale-95"
-              title="Sổ Tay Lỗi Sai & Sát Hạch Phục Thù"
-            >
-              <AlertTriangle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-              <span className="hidden sm:inline">Sổ lỗi sai</span>
-            </button>
-          )}
-
           {/* 1-Click Tạo Thẻ AI Button */}
           {onOpenCardGenerator && (
             <button
               onClick={onOpenCardGenerator}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-brand-50 to-indigo-50 dark:from-brand-950/60 dark:to-indigo-950/60 border border-brand-200/80 dark:border-brand-900/60 text-brand-700 dark:text-brand-300 font-bold text-xs shadow-xs hover:from-brand-100 hover:to-indigo-100 transition-all active:scale-95"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-50 to-indigo-50 dark:from-amber-950/40 dark:to-indigo-950/40 border border-amber-200/80 dark:border-amber-900/60 text-slate-800 dark:text-slate-200 font-bold text-xs shadow-xs hover:border-amber-400 transition-all active:scale-95"
               title="Rút trích Flashcard & Quiz tự động từ tài liệu"
             >
-              <Wand2 className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
-              <span className="hidden sm:inline">Tạo thẻ AI</span>
+              <Wand2 className="w-3.5 h-3.5 text-amber-500" />
+              <span>Tạo thẻ AI</span>
             </button>
           )}
 
-          {/* Feedback & Bug Report Button */}
-          {onOpenFeedback && (
+          {/* Sổ Tay Lỗi Sai Phục Thù */}
+          {onOpenMistakes && (
             <button
-              onClick={onOpenFeedback}
-              className="p-2 rounded-xl text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
-              title="Gửi đánh giá hoặc báo lỗi trực tiếp cho tác giả (phat7971@gmail.com)"
+              onClick={onOpenMistakes}
+              className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200/80 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs shadow-xs hover:border-rose-400 transition-all active:scale-95"
+              title="Sổ Tay Lỗi Sai & Sát Hạch Phục Thù"
             >
-              <HeartHandshake className="w-5 h-5" />
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
+              <span>Sổ lỗi sai</span>
             </button>
           )}
 
@@ -344,172 +285,366 @@ export const Dashboard: React.FC<DashboardProps> = ({
           >
             <Settings className="w-5 h-5" />
           </button>
+
+          {onOpenFeedback && (
+            <button
+              onClick={onOpenFeedback}
+              className="p-2 rounded-xl text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors hidden sm:block"
+              title="Gửi đánh giá hoặc báo lỗi trực tiếp cho tác giả"
+            >
+              <HeartHandshake className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </header>
 
-      {/* Hero Review Card */}
-      <section className="mb-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-slate-700/50">
-          <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-500/20 border border-brand-500/30 text-brand-400 text-xs font-semibold">
-                <Clock className="w-3.5 h-3.5" />
-                <span>Phiên ôn tập hôm nay</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
-                {dueCards.length > 0 ? (
-                  <>
-                    Có <span className="text-brand-400">{dueCards.length} thẻ</span> cần củng cố
-                  </>
-                ) : (
-                  <>Đã ôn tập xong hôm nay! 🎉</>
-                )}
-              </h2>
-              <p className="text-slate-300 text-xs sm:text-sm max-w-md">
-                {dueCards.length > 0
-                  ? 'Dành 5 phút để kích hoạt trí nhớ chủ động (Active Recall) và tránh đường cong lãng quên Ebbinghaus.'
-                  : 'Bạn đã hoàn thành toàn bộ thẻ đến hạn. Thêm thẻ mới hoặc tận hưởng ngày học hiệu quả!'}
-              </p>
+      {/* 2. HERO COMMAND CENTER: Brilliant Gamified Hero + RemNote Active Recall */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white p-6 sm:p-8 shadow-2xl border border-slate-800/80">
+        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/15 border border-brand-500/30 text-brand-400 text-xs font-bold tracking-wide">
+              <Clock className="w-3.5 h-3.5" />
+              <span>Phiên Ôn Tập Hôm Nay</span>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
-              {onOpenAudioFlashcard && cards.length > 0 && (
-                <button
-                  type="button"
-                  onClick={onOpenAudioFlashcard}
-                  className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 shadow-md transition-all active:scale-95 whitespace-nowrap w-full sm:w-auto"
-                  title="Nghe audio phát thanh câu hỏi & câu trả lời rảnh tay"
-                >
-                  <Headphones className="w-4 h-4 text-emerald-400" />
-                  <span>Podcast rảnh tay</span>
-                </button>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
+              {dueCards.length > 0 ? (
+                <>
+                  Có <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-emerald-300">{dueCards.length} thẻ kiến thức</span> đến hạn
+                </>
+              ) : (
+                <>
+                  Đã ôn tập xong toàn bộ thẻ hôm nay!
+                </>
               )}
+            </h2>
 
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+              {dueCards.length > 0
+                ? 'Ôn tập các thẻ đến hạn để duy trì chuỗi ghi nhớ.'
+                : 'Bạn đã hoàn thành các thẻ cần ôn tập.'}
+            </p>
+          </div>
+
+          {/* Action Center Buttons */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+            {onOpenAudioFlashcard && cards.length > 0 && (
               <button
-                onClick={() => onStartReview(selectedCategory)}
-                disabled={selectedCategory === 'all' ? dueCards.length === 0 : categoryTotals[selectedCategory] === 0}
-                className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-black text-sm tracking-wide shadow-lg transition-all active:scale-95 whitespace-nowrap w-full sm:w-auto ${
-                  (selectedCategory === 'all' ? dueCards.length > 0 : categoryTotals[selectedCategory] > 0)
-                    ? 'bg-brand-500 hover:bg-brand-400 text-slate-950 shadow-brand-500/30 cursor-pointer'
-                    : 'bg-slate-700 text-slate-400 cursor-not-allowed opacity-60'
-                }`}
-                title={selectedCategory !== 'all' ? `Ôn tập các thẻ thuộc ${CATEGORY_NAMES[selectedCategory]}` : 'Bắt đầu ôn tập tất cả thẻ'}
+                type="button"
+                onClick={onOpenAudioFlashcard}
+                className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-xs bg-slate-800/90 hover:bg-slate-750 text-slate-100 border border-slate-700/80 shadow-md transition-all active:scale-95 whitespace-nowrap"
+                title="Nghe audio phát thanh câu hỏi & câu trả lời rảnh tay"
               >
-                <Play className="w-4 h-4 fill-current" />
+                <Headphones className="w-4 h-4 text-emerald-400" />
+                <span>Podcast Rảnh Tay</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => onStartReview(selectedCategory)}
+              disabled={selectedCategory === 'all' ? dueCards.length === 0 : categoryTotals[selectedCategory] === 0}
+              className={`flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-2xl font-black text-sm tracking-wide shadow-xl transition-all active:scale-95 whitespace-nowrap ${
+                (selectedCategory === 'all' ? dueCards.length > 0 : categoryTotals[selectedCategory] > 0)
+                  ? 'bg-gradient-to-r from-brand-400 to-emerald-400 hover:from-brand-300 hover:to-emerald-300 text-slate-950 shadow-brand-500/30 cursor-pointer scale-102 hover:scale-105'
+                  : 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed opacity-60'
+              }`}
+            >
+              <Play className="w-4 h-4 fill-current" />
+              <span>
                 {selectedCategory !== 'all'
                   ? (dueCounts[selectedCategory] > 0
                       ? `Ôn ${CATEGORY_NAMES[selectedCategory]} (${dueCounts[selectedCategory]} thẻ)`
                       : `Ôn luyện ${CATEGORY_NAMES[selectedCategory]}`)
                   : (dueCards.length > 0
-                      ? 'Ôn tất cả thẻ ngay'
-                      : 'Đã thuộc hết')}
-              </button>
-            </div>
-          </div>
-
-          {/* Lĩnh Vực Chuyên Môn - Ôn Riêng Từng Môn */}
-          <div className="relative z-10 mt-6 pt-5 border-t border-slate-700/60">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-                <span>Ôn riêng theo từng lĩnh vực chuyên môn</span>
+                      ? `Ôn Tập Tất Cả (${dueCards.length} Thẻ)`
+                      : 'Đã Thuộc Toàn Bộ')}
               </span>
-              <span className="text-[11px] text-slate-400">Chọn 1 môn để tập trung ghi nhớ sâu</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 4 Lĩnh Vực Chuyên Môn: Bento Grid Cards (Heptabase Spatial Style) */}
+        <div className="relative z-10 mt-7 pt-5 border-t border-slate-800">
+          <div className="flex items-center justify-between gap-1 mb-3">
+            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-brand-400" />
+              <span>Ôn Theo Từng Lĩnh Vực Chuyên Môn</span>
+            </span>
+            <span className="text-[11px] text-slate-400 hidden sm:inline">Bấm để tập trung ôn sâu từng chủ đề</span>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {REVIEW_CATEGORIES.map((cat) => {
+              const catDue = dueCounts[cat.key] || 0;
+              const catTotal = categoryTotals[cat.key] || 0;
+              const hasDue = catDue > 0;
+              const isSelected = selectedCategory === cat.key;
+
+              return (
+                <button
+                  key={cat.key}
+                  type="button"
+                  onClick={() => onStartReview(cat.key)}
+                  disabled={catTotal === 0}
+                  className={`group relative p-3.5 rounded-2xl border text-left transition-all active:scale-95 flex flex-col justify-between ${
+                    catTotal === 0
+                      ? 'opacity-35 cursor-not-allowed bg-slate-900/40 border-slate-800'
+                      : isSelected
+                      ? 'bg-gradient-to-br from-slate-800 to-indigo-950 border-brand-400 ring-2 ring-brand-500/30 shadow-lg'
+                      : hasDue
+                      ? `bg-slate-900/80 hover:bg-slate-850 border-slate-700/80 hover:border-slate-500 shadow-sm`
+                      : 'bg-slate-900/50 hover:bg-slate-850 border-slate-800/80 opacity-80'
+                  }`}
+                  title={
+                    catTotal === 0
+                      ? `Chưa có thẻ trong mục ${cat.label}`
+                      : `Bấm để ôn riêng mục ${cat.label} (${catDue} cần ôn / ${catTotal} thẻ)`
+                  }
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`p-1.5 rounded-xl ${cat.bgClass} ${cat.textClass}`}>
+                        {cat.icon}
+                      </span>
+                      <span className="font-bold text-xs text-slate-200 group-hover:text-white truncate">
+                        {cat.label}
+                      </span>
+                    </div>
+                    {hasDue ? (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-brand-500 text-slate-950 font-mono shadow-xs">
+                        {catDue}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        {catTotal}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between text-[11px] mt-1 pt-1.5 border-t border-slate-800/80">
+                    <span className="text-slate-400 text-[10px]">
+                      {hasDue ? `${catDue} cần ôn` : `${catTotal} thẻ`}
+                    </span>
+                    <span className={`font-black text-[10px] flex items-center gap-1 ${
+                      hasDue ? 'text-brand-400 group-hover:underline' : 'text-slate-400 group-hover:text-slate-200'
+                    }`}>
+                      <Play className="w-2.5 h-2.5 fill-current" />
+                      <span>{hasDue ? 'Ôn ngay' : 'Xem thẻ'}</span>
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Ambient Decorative Glows */}
+        <div className="absolute -top-16 -right-16 w-64 h-64 bg-brand-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-64 h-64 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+      </section>
+
+      {/* 3. BENTO GRID 3 KHÔNG GIAN HỌC TẬP TOÀN CẦU (RemNote • Heptabase • Brilliant Converged Hubs) */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-brand-500" />
+            <span>Không Gian Học Tập</span>
+          </h3>
+          <span className="text-[11px] text-slate-400 dark:text-slate-500">3 Không gian chuyên biệt</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* HUB 1: REMNOTE (Ghi Nhớ & Đọc) */}
+          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="p-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                  <BookMarked className="w-5 h-5" />
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-mono">
+                  REMNOTE STYLE
+                </span>
+              </div>
+
+              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                Ghi Nhớ & Tài Liệu
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+                Đọc tài liệu, ghi chú Cornell và quét OCR.
+              </p>
+
+              <div className="space-y-1.5">
+                {onOpenCornell && (
+                  <button
+                    onClick={onOpenCornell}
+                    className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <FileText className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Ghi chú Cornell (3 Vùng)</span>
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
+                )}
+
+                {onOpenScanner && (
+                  <button
+                    onClick={onOpenScanner}
+                    className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <ScanText className="w-3.5 h-3.5 text-sky-500" />
+                      <span>Quét tài liệu AI (Scanner)</span>
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
+                )}
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-              {REVIEW_CATEGORIES.map((cat) => {
-                const catDue = dueCounts[cat.key] || 0;
-                const catTotal = categoryTotals[cat.key] || 0;
-                const hasDue = catDue > 0;
-                const isSelected = selectedCategory === cat.key;
-
-                return (
-                  <button
-                    key={cat.key}
-                    type="button"
-                    onClick={() => onStartReview(cat.key)}
-                    disabled={catTotal === 0}
-                    className={`group relative p-3 sm:p-3.5 rounded-2xl border text-left transition-all active:scale-95 flex flex-col justify-between ${
-                      catTotal === 0
-                        ? 'opacity-40 cursor-not-allowed bg-slate-800/30 border-slate-800'
-                        : isSelected
-                        ? 'bg-slate-800 border-brand-400 ring-2 ring-brand-500/30 shadow-lg'
-                        : hasDue
-                        ? 'bg-slate-800/80 hover:bg-slate-750 border-slate-700 hover:border-slate-500 shadow-sm'
-                        : 'bg-slate-850/60 hover:bg-slate-800 border-slate-700/40 opacity-80'
-                    }`}
-                    title={
-                      catTotal === 0
-                        ? `Chưa có thẻ trong mục ${cat.label}`
-                        : `Bấm để ôn riêng mục ${cat.label} (${catDue} thẻ đến hạn / ${catTotal} tổng thẻ)`
-                    }
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`p-1.5 rounded-xl ${cat.bgClass} ${cat.textClass}`}>
-                          {cat.icon}
-                        </span>
-                        <span className="font-bold text-xs text-slate-200 group-hover:text-white truncate">
-                          {cat.label}
-                        </span>
-                      </div>
-                      {hasDue ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-brand-500 text-slate-950 font-mono">
-                          {catDue}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] text-slate-500 font-mono">
-                          {catTotal}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between text-[11px] mt-1 pt-1.5 border-t border-slate-700/40">
-                      <span className="text-slate-400 text-[10px]">
-                        {hasDue ? `${catDue} cần ôn` : `${catTotal} thẻ`}
-                      </span>
-                      <span className={`font-black text-[10px] flex items-center gap-1 ${
-                        hasDue ? 'text-brand-400 group-hover:underline' : 'text-slate-400 group-hover:text-slate-200'
-                      }`}>
-                        <Play className="w-2.5 h-2.5 fill-current" />
-                        <span>{hasDue ? 'Ôn ngay' : 'Ôn luyện'}</span>
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+              <span className="flex items-center gap-1 font-mono">
+                <FolderTree className="w-3 h-3 text-amber-500" />
+                <span>{treeData ? countTotalFilesInTree(treeData) : 0} file tài liệu</span>
+              </span>
+              <span className="font-bold text-indigo-600 dark:text-indigo-400">Xem Vault ➔</span>
             </div>
           </div>
 
-          {/* Decorative Background Glow */}
-          <div className="absolute -top-12 -right-12 w-48 h-48 bg-brand-500/20 rounded-full blur-3xl pointer-events-none" />
+          {/* HUB 2: HEPTABASE (Tư Duy Không Gian & Bản Đồ) */}
+          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="p-2 rounded-2xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400">
+                  <BrainCircuit className="w-5 h-5" />
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300 font-mono">
+                  HEPTABASE STYLE
+                </span>
+              </div>
+
+              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                Tư Duy & Bản Đồ
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+                Sơ đồ tư duy Mindmap, phản biện Feynman và tra cứu.
+              </p>
+
+              <div className="space-y-1.5">
+                {onOpenMindmap && (
+                  <button
+                    onClick={onOpenMindmap}
+                    className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:text-teal-600 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Network className="w-3.5 h-3.5 text-teal-500" />
+                      <span>Sơ đồ tư duy (MindMap Canvas)</span>
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
+                )}
+
+                <button
+                  onClick={() => onToggleSidebar()}
+                  className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:text-teal-600 transition-colors"
+                >
+                  <span className="flex items-center gap-2">
+                    <Lightbulb className="w-3.5 h-3.5 text-purple-500" />
+                    <span>Phản biện Feynman Socratic</span>
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+              <span className="flex items-center gap-1 font-mono">
+                <Bookmark className="w-3 h-3 text-emerald-500" />
+                <span>CheatSheet tra cứu</span>
+              </span>
+              <span className="font-bold text-teal-600 dark:text-teal-400">Mở Canvas ➔</span>
+            </div>
+          </div>
+
+          {/* HUB 3: BRILLIANT (Luyện Tập & Phản Xạ) */}
+          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="p-2 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400">
+                  <Zap className="w-5 h-5" />
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-mono">
+                  BRILLIANT STYLE
+                </span>
+              </div>
+
+              <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
+                Luyện Thi & Tập Trung
+              </h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+                Thi trắc nghiệm, sổ lỗi sai và đồng hồ Pomodoro.
+              </p>
+
+              <div className="space-y-1.5">
+                {onOpenPomodoro && (
+                  <button
+                    onClick={onOpenPomodoro}
+                    className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-600 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Pomodoro Focus (25 Phút)</span>
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
+                )}
+
+                {onOpenAdvisor && (
+                  <button
+                    onClick={onOpenAdvisor}
+                    className="w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:text-amber-600 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Compass className="w-3.5 h-3.5 text-blue-500" />
+                      <span>Trợ lý lộ trình & Thói quen</span>
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+              <span className="flex items-center gap-1 font-mono">
+                <GraduationCap className="w-3 h-3 text-purple-500" />
+                <span>Phòng thi Quiz Master</span>
+              </span>
+              <span className="font-bold text-amber-600 dark:text-amber-400">Vào Phòng Thi ➔</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Activity Heatmap & Deadline Countdown Section */}
-      <section className="space-y-6 mb-8">
-        {/* Heatmap: Thói quen chăm chỉ */}
+      {/* 4. ACTIVITY HEATMAP & DEADLINE TRACKER: Brilliant Gamification */}
+      <section className="space-y-6">
         <StudyHeatmap
           historyMap={stats.historyMap}
           streak={stats.streak}
           onActivityLogged={onActivityLogged}
         />
 
-        {/* Deadline Manager: Quản lý đếm ngược nhiệm vụ & bài tập */}
         <DeadlineManager
           treeData={treeData}
           onActivityLogged={onActivityLogged}
         />
       </section>
 
-      {/* Filter Status & Search Bar */}
-      <section className="space-y-3 mb-6">
+      {/* 5. FILTER BAR & SEARCH: RemNote Structured Outliner Search */}
+      <section className="space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Active Category Indicator Banner */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Danh mục:</span>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold shadow-xs border border-transparent dark:border-slate-700">
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-semibold">Lọc danh mục:</span>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold shadow-xs border border-transparent dark:border-slate-700">
               <span>{CATEGORY_NAMES[selectedCategory]}</span>
               <span className="text-[10px] text-slate-400 font-mono">({filteredCards.length})</span>
               {selectedCategory !== 'all' && (
@@ -530,7 +665,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               Đổi danh mục ➔
             </button>
 
-            {/* Nút Mở Modal: Chọn 1 danh mục cần xóa hoặc Xóa tất cả */}
+            {/* Nút Xóa Danh Mục / Xóa Tất Cả */}
             <button
               onClick={() => {
                 if (onOpenDeleteCategory) {
@@ -539,14 +674,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   setIsDeleteCategoryModalOpen(true);
                 }
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/60 border border-rose-200/90 dark:border-rose-900/60 transition-all active:scale-95 shadow-xs ml-1"
-              title="Chọn 1 danh mục cần xóa hoặc xóa tất cả thẻ"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/60 border border-rose-200/90 dark:border-rose-900/60 transition-all active:scale-95 shadow-xs ml-1"
+              title="Quản lý xóa theo danh mục hoặc xóa tất cả thẻ"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Xóa danh mục / Xóa tất cả</span>
+              <span>Dọn dẹp thẻ</span>
             </button>
 
-            {/* Nút xóa nhanh nếu đang lọc theo 1 danh mục cụ thể */}
             {selectedCategory !== 'all' && filteredCards.length > 0 && (
               <button
                 onClick={handleQuickDeleteCurrentCategory}
@@ -561,32 +695,32 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
           {/* Search Box */}
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3.5 top-2.5 text-slate-400" />
             <input
               type="text"
-              placeholder="Tìm kiếm thẻ hoặc hashtag..."
+              placeholder="Tìm kiếm thẻ hoặc #tag..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:w-64 pl-9 pr-3.5 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500"
+              className="w-full sm:w-72 pl-9 pr-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500/30 focus:border-brand-500 shadow-xs"
             />
           </div>
         </div>
       </section>
 
-      {/* Cards List Grid */}
-      <section>
-        <div className="flex items-center justify-between mb-3 text-xs text-slate-500 dark:text-slate-400 font-semibold">
-          <span>Danh sách thẻ kiến thức ({filteredCards.length})</span>
-          <span>Click vào thẻ để xem chi tiết</span>
+      {/* 6. SPATIAL CARDS GRID: Heptabase Visual Cards */}
+      <section className="space-y-3 pb-8">
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-semibold">
+          <span>Thư viện thẻ kiến thức ({filteredCards.length})</span>
+          <span>Click vào thẻ để xem phân tích 2 mặt</span>
         </div>
 
         {filteredCards.length === 0 ? (
-          <div className="py-16 text-center rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
-            <div className="w-12 h-12 mx-auto rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-3">
-              <Sparkles className="w-6 h-6" />
+          <div className="py-16 text-center rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 p-8 backdrop-blur-sm">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-brand-50 dark:bg-brand-950/60 text-brand-500 flex items-center justify-center mb-3">
+              <Sparkles className="w-7 h-7" />
             </div>
-            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Chưa có thẻ nào trong mục này</p>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Bấm nút "Thêm thẻ" ở góc trên để bổ sung kiến thức đầu tiên.</p>
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Chưa có thẻ nào trong bộ lọc này</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Bấm nút "Thêm thẻ" ở góc trên hoặc dùng phím tắt Ctrl + K để bổ sung.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -596,10 +730,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 <div
                   key={card.id}
                   onClick={() => setPreviewCard(card)}
-                  className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-brand-400 dark:hover:border-brand-500 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group"
+                  className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-brand-400 dark:hover:border-brand-500 hover:shadow-lg transition-all duration-200 cursor-pointer flex flex-col justify-between group hover:-translate-y-0.5"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-2.5">
                       <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
                         card.category === 'code' ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300' :
                         card.category === 'english' ? 'bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300' :
@@ -638,14 +772,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     </p>
                   </div>
 
-                  <div className="mt-3 pt-2.5 border-t border-slate-50 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
+                  <div className="mt-3.5 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
                     <div className="flex gap-1.5 overflow-hidden">
                       {card.tags.slice(0, 2).map((t) => (
                         <span key={t} className="truncate">#{t}</span>
                       ))}
                     </div>
-                    <span className="font-mono text-[10px] font-medium">
-                      Reps: {card.repetitions}
+                    <span className="font-mono text-[10px] font-medium flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 text-brand-500" />
+                      <span>{card.repetitions} lần</span>
                     </span>
                   </div>
                 </div>
@@ -654,7 +789,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         )}
       </section>
-
 
       {/* Modal Preview Single Card */}
       {previewCard && (
