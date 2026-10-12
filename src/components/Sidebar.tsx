@@ -221,20 +221,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {catDue > 0 ? (
                       <span
                         className="text-[10px] font-black px-2 py-0.5 rounded-full bg-brand-500 text-slate-950 font-mono shadow-xs"
-                        title={`${catDue} thẻ đến hạn cần ôn (trong tổng số ${count} thẻ)`}
+                        title={`${catDue} thẻ đến hạn cần ôn (tổng ${count} thẻ)`}
                       >
                         {catDue}
                       </span>
                     ) : (
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
-                          isSelected
-                            ? 'bg-brand-200/70 dark:bg-brand-900/70 text-brand-800 dark:text-brand-200'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                        }`}
-                        title={`${count} thẻ`}
+                        className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800/80 text-slate-400 dark:text-slate-500 font-mono"
+                        title={`0 thẻ cần ôn (tổng ${count} thẻ)`}
                       >
-                        {count}
+                        0
                       </span>
                     )}
                   </button>
