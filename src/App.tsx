@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Menu, Check } from 'lucide-react';
 import { Card, Category, UserStats } from './lib/types';
 import { getCards, getUserStats } from './lib/storage';
-import { filterDueCards } from './lib/srs-engine';
+import { filterDueCards, getDueCountsByCategory } from './lib/srs-engine';
 import { loadQuizSets } from './lib/quiz-storage';
 import { applyTheme, getStoredTheme, setupSystemThemeListener } from './lib/theme';
 import { Dashboard } from './components/Dashboard';
@@ -46,6 +46,7 @@ export default function App() {
     historyMap: {},
   });
   const [isReviewing, setIsReviewing] = useState(false);
+  const [reviewCategory, setReviewCategory] = useState<Category | 'all'>('all');
   const [isQuickCaptureOpen, setIsQuickCaptureOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
@@ -148,6 +149,21 @@ export default function App() {
   }, []);
 
   const dueCards = useMemo(() => filterDueCards(cards), [cards]);
+  const dueCountsByCategory = useMemo(() => getDueCountsByCategory(cards), [cards]);
+
+  const activeReviewCards = useMemo(() => {
+    if (reviewCategory === 'all') {
+      return dueCards.length > 0 ? dueCards : cards.slice(0, 5);
+    }
+    const catCards = cards.filter((c) => c.category === reviewCategory);
+    const catDueCards = filterDueCards(catCards);
+    return catDueCards.length > 0 ? catDueCards : catCards.slice(0, 10);
+  }, [cards, dueCards, reviewCategory]);
+
+  const handleStartReview = (category?: Category | 'all') => {
+    setReviewCategory(category || selectedCategory || 'all');
+    setIsReviewing(true);
+  };
 
   // Thống kê số lượng thẻ cho từng danh mục
   const cardCounts = useMemo<Record<Category | 'all', number>>(() => {
@@ -212,7 +228,28 @@ export default function App() {
     >
       {isReviewing ? (
         <ReviewPlayer
-          cards={dueCards.length > 0 ? dueCards : cards.slice(0, 5)}
+          cards={activeReviewCards}
+          category={reviewCategory}
+          categoryLabel={
+            reviewCategory === 'code'
+              ? 'Lập trình'
+              : reviewCategory === 'english'
+              ? 'Ngoại ngữ'
+              : reviewCategory === 'book'
+              ? 'Đọc sách'
+              : reviewCategory === 'exam'
+              ? 'Ôn thi chứng chỉ'
+              : 'Tất cả thẻ'
+          }
+          otherDueCounts={{
+            code: dueCountsByCategory.code,
+            english: dueCountsByCategory.english,
+            book: dueCountsByCategory.book,
+            exam: dueCountsByCategory.exam,
+          }}
+          onSwitchCategory={(nextCat) => {
+            setReviewCategory(nextCat);
+          }}
           onFinish={() => {
             reloadData();
             setIsReviewing(false);
@@ -239,8 +276,9 @@ export default function App() {
             quizCount={quizCount}
             totalTreeFiles={countTotalFilesInTree(treeData)}
             dueCount={dueCards.length}
+            dueCountsByCategory={dueCountsByCategory}
             streak={stats.streak}
-            onStartReview={() => setIsReviewing(true)}
+            onStartReview={handleStartReview}
             onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
             onOpenDeleteCategory={() => setIsDeleteCategoryOpen(true)}
@@ -268,7 +306,7 @@ export default function App() {
                 onSelectCategory={setSelectedCategory}
                 isSidebarOpen={isSidebarOpen}
                 onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-                onStartReview={() => setIsReviewing(true)}
+                onStartReview={handleStartReview}
                 onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
                 onOpenSettings={() => setIsSettingsOpen(true)}
                 onCardDeleted={() => reloadData()}

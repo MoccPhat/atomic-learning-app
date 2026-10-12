@@ -1,4 +1,4 @@
-import { Card, ReviewGrade } from './types';
+import { Card, Category, ReviewGrade } from './types';
 
 /**
  * Định dạng ngày Date sang chuỗi YYYY-MM-DD
@@ -94,6 +94,47 @@ export function isCardDue(card: Card, todayStr: string = formatDate()): boolean 
  */
 export function filterDueCards(cards: Card[], todayStr: string = formatDate()): Card[] {
   return cards.filter((card) => isCardDue(card, todayStr));
+}
+
+/**
+ * Lọc danh sách thẻ cần ôn theo từng danh mục cụ thể hoặc tất cả
+ */
+export function filterDueCardsByCategory(
+  cards: Card[],
+  category: Category | 'all',
+  todayStr: string = formatDate()
+): Card[] {
+  if (category === 'all') {
+    return filterDueCards(cards, todayStr);
+  }
+  return cards.filter((card) => card.category === category && isCardDue(card, todayStr));
+}
+
+/**
+ * Tính số lượng thẻ đến hạn theo từng danh mục
+ */
+export function getDueCountsByCategory(
+  cards: Card[],
+  todayStr: string = formatDate()
+): Record<Category | 'all', number> {
+  const counts: Record<Category | 'all', number> = {
+    all: 0,
+    code: 0,
+    english: 0,
+    book: 0,
+    exam: 0,
+  };
+
+  cards.forEach((card) => {
+    if (isCardDue(card, todayStr)) {
+      counts.all += 1;
+      if (counts[card.category] !== undefined) {
+        counts[card.category] += 1;
+      }
+    }
+  });
+
+  return counts;
 }
 
 /**

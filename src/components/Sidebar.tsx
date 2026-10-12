@@ -40,8 +40,9 @@ interface SidebarProps {
   quizCount: number;
   totalTreeFiles: number;
   dueCount: number;
+  dueCountsByCategory?: Record<Category | 'all', number>;
   streak: number;
-  onStartReview: () => void;
+  onStartReview: (category?: Category | 'all') => void;
   onOpenQuickCapture: () => void;
   onOpenSettings: () => void;
   onOpenDeleteCategory?: () => void;
@@ -70,6 +71,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   quizCount,
   totalTreeFiles,
   dueCount,
+  dueCountsByCategory,
   streak,
   onStartReview,
   onOpenQuickCapture,
@@ -132,17 +134,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {dueCount > 0 ? (
             <button
               onClick={() => {
-                onStartReview();
+                onStartReview(selectedCategory);
                 if (window.innerWidth < 1024) onClose();
               }}
               className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 active:scale-98 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition-all"
+              title={selectedCategory !== 'all' ? `Ôn tập thẻ mục ${selectedCategory}` : 'Ôn tập tất cả thẻ'}
             >
               <div className="flex items-center gap-2">
                 <Play className="w-4 h-4 fill-current" />
-                <span>Ôn tập thẻ ngay</span>
+                <span>
+                  {selectedCategory !== 'all' && CATEGORIES.find((c) => c.key === selectedCategory)?.label
+                    ? `Ôn ${CATEGORIES.find((c) => c.key === selectedCategory)?.label}`
+                    : 'Ôn tập thẻ ngay'}
+                </span>
               </div>
               <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-black">
-                {dueCount}
+                {selectedCategory !== 'all' && dueCountsByCategory
+                  ? dueCountsByCategory[selectedCategory] || 0
+                  : dueCount}
               </span>
             </button>
           ) : (
@@ -186,38 +195,70 @@ export const Sidebar: React.FC<SidebarProps> = ({
               {CATEGORIES.map((cat) => {
                 const isSelected = activeTab === 'cards' && selectedCategory === cat.key;
                 const count = cardCounts[cat.key] || 0;
+                const catDue = dueCountsByCategory ? dueCountsByCategory[cat.key] || 0 : 0;
 
                 return (
-                  <button
-                    key={cat.key}
-                    onClick={() => {
-                      onSelectTab('cards');
-                      onSelectCategory(cat.key);
-                      if (window.innerWidth < 1024) onClose();
-                    }}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
-                      isSelected
-                        ? 'bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 font-bold border border-brand-200 dark:border-brand-800 shadow-xs'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-slate-100'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className={isSelected ? 'text-brand-600 dark:text-brand-400' : cat.color}>
-                        {cat.icon}
-                      </span>
-                      <span>{cat.label}</span>
-                    </div>
-
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
+                  <div key={cat.key} className="group/item flex items-center gap-1">
+                    <button
+                      onClick={() => {
+                        onSelectTab('cards');
+                        onSelectCategory(cat.key);
+                        if (window.innerWidth < 1024) onClose();
+                      }}
+                      className={`flex-1 flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                         isSelected
-                          ? 'bg-brand-200/70 dark:bg-brand-900/70 text-brand-800 dark:text-brand-200'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                          ? 'bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 font-bold border border-brand-200 dark:border-brand-800 shadow-xs'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-slate-100'
                       }`}
                     >
-                      {count}
-                    </span>
-                  </button>
+                      <div className="flex items-center gap-2.5">
+                        <span className={isSelected ? 'text-brand-600 dark:text-brand-400' : cat.color}>
+                          {cat.icon}
+                        </span>
+                        <span>{cat.label}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        {catDue > 0 && (
+                          <span
+                            className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-brand-500 text-slate-950 font-mono shadow-xs"
+                            title={`${catDue} thẻ đến hạn cần ôn`}
+                          >
+                            {catDue}
+                          </span>
+                        )}
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
+                            isSelected
+                              ? 'bg-brand-200/70 dark:bg-brand-900/70 text-brand-800 dark:text-brand-200'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </div>
+                    </button>
+
+                    {/* Nút ôn riêng chuyên mục này */}
+                    {cat.key !== 'all' && count > 0 && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onStartReview(cat.key);
+                          if (window.innerWidth < 1024) onClose();
+                        }}
+                        className={`p-1.5 rounded-lg transition-all ${
+                          catDue > 0
+                            ? 'text-brand-500 hover:text-white hover:bg-brand-500 opacity-90 group-hover/item:opacity-100'
+                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 opacity-0 group-hover/item:opacity-100'
+                        }`}
+                        title={`Bắt đầu ôn riêng mục ${cat.label} (${catDue} thẻ cần ôn / ${count} tổng thẻ)`}
+                      >
+                        <Play className="w-3.5 h-3.5 fill-current" />
+                      </button>
+                    )}
+                  </div>
                 );
               })}
             </nav>

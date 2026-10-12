@@ -13,7 +13,7 @@ import {
   Settings2,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { Card, ReviewGrade } from '../lib/types';
+import { Card, Category, ReviewGrade } from '../lib/types';
 import { recordReview } from '../lib/storage';
 import { CodeCardView } from './CodeCardView';
 import { speakText, stopSpeaking, detectLanguage } from '../lib/speech-service';
@@ -22,11 +22,23 @@ import { recordMistake } from '../lib/mistakes-storage';
 
 interface ReviewPlayerProps {
   cards: Card[];
+  category?: Category | 'all';
+  categoryLabel?: string;
   onFinish: () => void;
   onExit: () => void;
+  onSwitchCategory?: (nextCategory: Category) => void;
+  otherDueCounts?: Partial<Record<Category, number>>;
 }
 
-export const ReviewPlayer: React.FC<ReviewPlayerProps> = ({ cards, onFinish, onExit }) => {
+export const ReviewPlayer: React.FC<ReviewPlayerProps> = ({
+  cards,
+  category = 'all',
+  categoryLabel,
+  onFinish,
+  onExit,
+  onSwitchCategory,
+  otherDueCounts,
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [completed, setCompleted] = useState(false);
@@ -225,15 +237,27 @@ export const ReviewPlayer: React.FC<ReviewPlayerProps> = ({ cards, onFinish, onE
     }
   };
 
+const CATEGORY_META: Record<Category, { label: string; icon: string; color: string; bg: string }> = {
+  code: { label: 'Lập trình', icon: '💻', color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800' },
+  english: { label: 'Ngoại ngữ', icon: '🌐', color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-950/60 border-sky-200 dark:border-sky-800' },
+  book: { label: 'Đọc sách', icon: '📖', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800' },
+  exam: { label: 'Ôn thi chứng chỉ', icon: '🏆', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800' },
+};
+
   if (completed) {
+    const isSpecialized = category && category !== 'all' && CATEGORY_META[category];
     return (
       <div className="max-w-md mx-auto py-12 px-4 text-center animate-fade-in">
         <div className="w-20 h-20 mx-auto rounded-full bg-brand-100 dark:bg-brand-950 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-6 shadow-lg shadow-brand-500/20">
           <CheckCircle2 className="w-12 h-12" />
         </div>
-        <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">Tuyệt vời! Hoàn thành ôn tập</h2>
+        <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">
+          {isSpecialized
+            ? `Tuyệt vời! Hoàn thành ôn tập ${categoryLabel || CATEGORY_META[category].label} ${CATEGORY_META[category].icon}`
+            : 'Tuyệt vời! Hoàn thành ôn tập'}
+        </h2>
         <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
-          Bạn vừa củng cố <span className="font-bold text-slate-800 dark:text-slate-200">{sessionReviewedCount} thẻ kiến thức</span> vào trí nhớ dài hạn.
+          Bạn vừa củng cố <span className="font-bold text-slate-800 dark:text-slate-200">{sessionReviewedCount} thẻ {categoryLabel || (isSpecialized ? CATEGORY_META[category].label : 'kiến thức')}</span> vào trí nhớ dài hạn.
         </p>
 
         <div className="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm mb-6 flex items-center justify-around">
@@ -250,6 +274,36 @@ export const ReviewPlayer: React.FC<ReviewPlayerProps> = ({ cards, onFinish, onE
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Thói quen giữ vững</span>
           </div>
         </div>
+
+        {/* Gợi ý các chuyên môn khác còn thẻ đến hạn */}
+        {otherDueCounts && Object.entries(otherDueCounts).some(([catKey, count]) => catKey !== category && (count || 0) > 0) && (
+          <div className="mb-6 p-4 rounded-3xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-left">
+            <span className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2.5">
+              Chuyên môn khác còn thẻ cần ôn:
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(otherDueCounts).map(([catKey, count]) => {
+                if (catKey === category || !count || count <= 0) return null;
+                const meta = CATEGORY_META[catKey as Category];
+                if (!meta) return null;
+                return (
+                  <button
+                    key={catKey}
+                    type="button"
+                    onClick={() => onSwitchCategory && onSwitchCategory(catKey as Category)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-500 shadow-xs transition-all active:scale-95 text-slate-700 dark:text-slate-200"
+                  >
+                    <span>{meta.icon}</span>
+                    <span>{meta.label}</span>
+                    <span className="px-1.5 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 font-mono text-[10px]">
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <button
           onClick={onFinish}
@@ -280,8 +334,16 @@ export const ReviewPlayer: React.FC<ReviewPlayerProps> = ({ cards, onFinish, onE
         </button>
 
         <div className="flex-1 mx-2">
-          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1">
-            <span>Tiến độ: {currentIndex + 1} / {cards.length}</span>
+          <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1">
+            <div className="flex items-center gap-2">
+              <span>Tiến độ: {currentIndex + 1} / {cards.length}</span>
+              {category && category !== 'all' && CATEGORY_META[category] && (
+                <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full border ${CATEGORY_META[category].bg} ${CATEGORY_META[category].color}`}>
+                  <span>{CATEGORY_META[category].icon}</span>
+                  <span>{CATEGORY_META[category].label}</span>
+                </span>
+              )}
+            </div>
             <span>{progressPercent}%</span>
           </div>
           <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">

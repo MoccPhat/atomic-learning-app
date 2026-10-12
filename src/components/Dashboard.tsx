@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Flame,
   Plus,
@@ -21,9 +21,13 @@ import {
   Wand2,
   Headphones,
   HeartHandshake,
+  Code,
+  Globe,
+  BookOpen,
+  Award,
 } from 'lucide-react';
 import { Card, Category, UserStats } from '../lib/types';
-import { isCardDue, filterDueCards } from '../lib/srs-engine';
+import { isCardDue, filterDueCards, getDueCountsByCategory } from '../lib/srs-engine';
 import { deleteCard, deleteCardsByCategory } from '../lib/storage';
 import { StudyHeatmap } from './analytics/StudyHeatmap';
 import { DeadlineManager } from './deadlines/DeadlineManager';
@@ -38,7 +42,7 @@ interface DashboardProps {
   onSelectCategory: (cat: Category | 'all') => void;
   isSidebarOpen: boolean;
   onToggleSidebar: () => void;
-  onStartReview: () => void;
+  onStartReview: (category?: Category | 'all') => void;
   onOpenQuickCapture: () => void;
   onOpenSettings: () => void;
   onCardDeleted: (cardId?: string) => void;
@@ -62,8 +66,45 @@ const CATEGORY_NAMES: Record<Category | 'all', string> = {
   code: 'Lập trình',
   english: 'Ngoại ngữ',
   book: 'Đọc sách',
-  exam: 'Ôn thi cử',
+  exam: 'Ôn thi chứng chỉ',
 };
+
+const REVIEW_CATEGORIES: {
+  key: Category;
+  label: string;
+  icon: React.ReactNode;
+  bgClass: string;
+  textClass: string;
+}[] = [
+  {
+    key: 'code',
+    label: 'Lập trình',
+    icon: <Code className="w-4 h-4" />,
+    bgClass: 'bg-indigo-500/20',
+    textClass: 'text-indigo-400',
+  },
+  {
+    key: 'english',
+    label: 'Ngoại ngữ',
+    icon: <Globe className="w-4 h-4" />,
+    bgClass: 'bg-sky-500/20',
+    textClass: 'text-sky-400',
+  },
+  {
+    key: 'exam',
+    label: 'Ôn thi chứng chỉ',
+    icon: <Award className="w-4 h-4" />,
+    bgClass: 'bg-amber-500/20',
+    textClass: 'text-amber-400',
+  },
+  {
+    key: 'book',
+    label: 'Đọc sách',
+    icon: <BookOpen className="w-4 h-4" />,
+    bgClass: 'bg-emerald-500/20',
+    textClass: 'text-emerald-400',
+  },
+];
 
 export const Dashboard: React.FC<DashboardProps> = ({
   cards,
@@ -94,7 +135,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState(false);
 
-  const dueCards = filterDueCards(cards);
+  const dueCards = useMemo(() => filterDueCards(cards), [cards]);
+  const dueCounts = useMemo(() => getDueCountsByCategory(cards), [cards]);
+
+  const categoryTotals = useMemo<Record<Category | 'all', number>>(() => {
+    return {
+      all: cards.length,
+      code: cards.filter((c) => c.category === 'code').length,
+      english: cards.filter((c) => c.category === 'english').length,
+      book: cards.filter((c) => c.category === 'book').length,
+      exam: cards.filter((c) => c.category === 'exam').length,
+    };
+  }, [cards]);
 
   const filteredCards = cards.filter((card) => {
     const matchesCategory = selectedCategory === 'all' || card.category === selectedCategory;
@@ -334,17 +386,99 @@ export const Dashboard: React.FC<DashboardProps> = ({
               )}
 
               <button
-                onClick={onStartReview}
-                disabled={dueCards.length === 0}
+                onClick={() => onStartReview(selectedCategory)}
+                disabled={selectedCategory === 'all' ? dueCards.length === 0 : categoryTotals[selectedCategory] === 0}
                 className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-black text-sm tracking-wide shadow-lg transition-all active:scale-95 whitespace-nowrap w-full sm:w-auto ${
-                  dueCards.length > 0
+                  (selectedCategory === 'all' ? dueCards.length > 0 : categoryTotals[selectedCategory] > 0)
                     ? 'bg-brand-500 hover:bg-brand-400 text-slate-950 shadow-brand-500/30 cursor-pointer'
                     : 'bg-slate-700 text-slate-400 cursor-not-allowed opacity-60'
                 }`}
+                title={selectedCategory !== 'all' ? `Ôn tập các thẻ thuộc ${CATEGORY_NAMES[selectedCategory]}` : 'Bắt đầu ôn tập tất cả thẻ'}
               >
                 <Play className="w-4 h-4 fill-current" />
-                {dueCards.length > 0 ? 'Bắt đầu ôn tập ngay' : 'Đã thuộc hết'}
+                {selectedCategory !== 'all'
+                  ? (dueCounts[selectedCategory] > 0
+                      ? `Ôn ${CATEGORY_NAMES[selectedCategory]} (${dueCounts[selectedCategory]} thẻ)`
+                      : `Ôn luyện ${CATEGORY_NAMES[selectedCategory]}`)
+                  : (dueCards.length > 0
+                      ? 'Ôn tất cả thẻ ngay'
+                      : 'Đã thuộc hết')}
               </button>
+            </div>
+          </div>
+
+          {/* Lĩnh Vực Chuyên Môn - Ôn Riêng Từng Môn */}
+          <div className="relative z-10 mt-6 pt-5 border-t border-slate-700/60">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-3">
+              <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-brand-400" />
+                <span>Ôn riêng theo từng lĩnh vực chuyên môn</span>
+              </span>
+              <span className="text-[11px] text-slate-400">Chọn 1 môn để tập trung ghi nhớ sâu</span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+              {REVIEW_CATEGORIES.map((cat) => {
+                const catDue = dueCounts[cat.key] || 0;
+                const catTotal = categoryTotals[cat.key] || 0;
+                const hasDue = catDue > 0;
+                const isSelected = selectedCategory === cat.key;
+
+                return (
+                  <button
+                    key={cat.key}
+                    type="button"
+                    onClick={() => onStartReview(cat.key)}
+                    disabled={catTotal === 0}
+                    className={`group relative p-3 sm:p-3.5 rounded-2xl border text-left transition-all active:scale-95 flex flex-col justify-between ${
+                      catTotal === 0
+                        ? 'opacity-40 cursor-not-allowed bg-slate-800/30 border-slate-800'
+                        : isSelected
+                        ? 'bg-slate-800 border-brand-400 ring-2 ring-brand-500/30 shadow-lg'
+                        : hasDue
+                        ? 'bg-slate-800/80 hover:bg-slate-750 border-slate-700 hover:border-slate-500 shadow-sm'
+                        : 'bg-slate-850/60 hover:bg-slate-800 border-slate-700/40 opacity-80'
+                    }`}
+                    title={
+                      catTotal === 0
+                        ? `Chưa có thẻ trong mục ${cat.label}`
+                        : `Bấm để ôn riêng mục ${cat.label} (${catDue} thẻ đến hạn / ${catTotal} tổng thẻ)`
+                    }
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`p-1.5 rounded-xl ${cat.bgClass} ${cat.textClass}`}>
+                          {cat.icon}
+                        </span>
+                        <span className="font-bold text-xs text-slate-200 group-hover:text-white truncate">
+                          {cat.label}
+                        </span>
+                      </div>
+                      {hasDue ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-brand-500 text-slate-950 font-mono">
+                          {catDue}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          {catTotal}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] mt-1 pt-1.5 border-t border-slate-700/40">
+                      <span className="text-slate-400 text-[10px]">
+                        {hasDue ? `${catDue} cần ôn` : `${catTotal} thẻ`}
+                      </span>
+                      <span className={`font-black text-[10px] flex items-center gap-1 ${
+                        hasDue ? 'text-brand-400 group-hover:underline' : 'text-slate-400 group-hover:text-slate-200'
+                      }`}>
+                        <Play className="w-2.5 h-2.5 fill-current" />
+                        <span>{hasDue ? 'Ôn ngay' : 'Ôn luyện'}</span>
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
