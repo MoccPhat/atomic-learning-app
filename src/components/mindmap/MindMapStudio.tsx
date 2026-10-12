@@ -449,14 +449,9 @@ export const MindMapStudio: React.FC<MindMapStudioProps> = ({
               <Network className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm font-black text-slate-800 dark:text-slate-100 tracking-tight truncate max-w-[200px] sm:max-w-xs">
-                  {activeMap?.title || 'Sơ đồ tư duy'}
-                </h1>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono">
-                  Mindmap
-                </span>
-              </div>
+              <h1 className="text-sm font-black text-slate-800 dark:text-slate-100 tracking-tight truncate max-w-[200px] sm:max-w-xs">
+                {activeMap?.title || 'Sơ đồ tư duy'}
+              </h1>
             </div>
           </div>
         </div>

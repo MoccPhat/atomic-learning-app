@@ -480,15 +480,9 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
           </div>
 
           <div>
-            <h1 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2">
+            <h1 className="text-lg sm:text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
               Quét Tài Liệu
-              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/60 dark:border-slate-700">
-                OCR
-              </span>
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Trích xuất văn bản từ hình ảnh
-            </p>
           </div>
         </div>
 

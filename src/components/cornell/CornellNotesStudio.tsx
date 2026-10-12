@@ -225,17 +225,9 @@ export const CornellNotesStudio: React.FC<CornellNotesStudioProps> = ({
               <FileText className="w-6 h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                  Ghi Chú Cornell
-                </h1>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800">
-                  3 Vùng
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Ghi chép theo cấu trúc Cues, Notes và Summary
-              </p>
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                Ghi Chú Cornell
+              </h1>
             </div>
           </div>
         </div>

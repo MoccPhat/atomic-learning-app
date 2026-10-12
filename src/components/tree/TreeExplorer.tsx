@@ -452,9 +452,6 @@ export const TreeExplorer: React.FC<TreeExplorerProps> = ({
           <h2 className="text-xl sm:text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">
             Tài Liệu Học Tập
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-            Quản lý tài liệu theo cây thư mục môn học
-          </p>
         </div>
 
         {/* Action buttons */}

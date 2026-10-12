@@ -107,14 +107,9 @@ export const FeynmanStudio: React.FC<FeynmanStudioProps> = ({
             </button>
           )}
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg sm:text-xl font-black text-slate-800 dark:text-slate-100">
-                Phản Biện Feynman
-              </h2>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Diễn giải khái niệm bằng từ ngữ đơn giản
-            </p>
+            <h2 className="text-lg sm:text-xl font-black text-slate-800 dark:text-slate-100">
+              Phản Biện Feynman
+            </h2>
           </div>
         </div>
 
