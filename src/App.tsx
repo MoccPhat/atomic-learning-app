@@ -32,6 +32,7 @@ import { MistakeNotebookModal } from './components/mistakes/MistakeNotebookModal
 import { InstantCardGeneratorModal } from './components/tools/InstantCardGeneratorModal';
 import { AudioFlashcardModal } from './components/flashcards/AudioFlashcardModal';
 import { MobileBottomNav } from './components/navigation/MobileBottomNav';
+import { FeedbackModal } from './components/feedback/FeedbackModal';
 import { addQuizSetFromText } from './lib/quiz-storage';
 import { MistakeItem } from './lib/mistakes-types';
 
@@ -47,6 +48,7 @@ export default function App() {
   const [isReviewing, setIsReviewing] = useState(false);
   const [isQuickCaptureOpen, setIsQuickCaptureOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [isDeleteCategoryOpen, setIsDeleteCategoryOpen] = useState(false);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
   const [isMistakesOpen, setIsMistakesOpen] = useState(false);
@@ -249,6 +251,7 @@ export default function App() {
               setCardGenDocTitle('');
               setIsCardGeneratorOpen(true);
             }}
+            onOpenFeedback={() => setIsFeedbackOpen(true)}
           />
 
           {/* Vùng nội dung chính */}
@@ -285,6 +288,7 @@ export default function App() {
                   setIsCardGeneratorOpen(true);
                 }}
                 onOpenAudioFlashcard={() => setIsAudioFlashcardOpen(true)}
+                onOpenFeedback={() => setIsFeedbackOpen(true)}
               />
             ) : activeTab === 'quiz' ? (
               <div className="w-full">
@@ -466,6 +470,14 @@ export default function App() {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         onDataChanged={() => reloadData()}
+        onOpenFeedback={() => setIsFeedbackOpen(true)}
+      />
+
+      {/* User Feedback, Bug Report & Rating Modal */}
+      <FeedbackModal
+        isOpen={isFeedbackOpen}
+        onClose={() => setIsFeedbackOpen(false)}
+        onSuccessToast={(msg) => showGlobalToast(msg)}
       />
 
       {/* Delete Category Modal */}

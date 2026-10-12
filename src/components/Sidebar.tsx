@@ -24,6 +24,7 @@ import {
   Network,
   Target,
   Sparkles,
+  HeartHandshake,
 } from 'lucide-react';
 import { Category } from '../lib/types';
 import { KaiLogo } from './KaiLogo';
@@ -47,6 +48,7 @@ interface SidebarProps {
   onOpenAchievements?: () => void;
   onOpenMistakes?: () => void;
   onOpenCardGenerator?: () => void;
+  onOpenFeedback?: () => void;
 }
 
 const CATEGORIES: { key: Category | 'all'; label: string; icon: React.ReactNode; color: string }[] = [
@@ -76,6 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenAchievements,
   onOpenMistakes,
   onOpenCardGenerator,
+  onOpenFeedback,
 }) => {
   return (
     <>
@@ -574,6 +577,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <Settings className="w-4 h-4 text-slate-500 dark:text-slate-400" />
                 <span>Cài đặt & Giao diện</span>
               </button>
+
+              {onOpenFeedback && (
+                <button
+                  onClick={() => {
+                    onOpenFeedback();
+                    if (window.innerWidth < 1024) onClose();
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-700 dark:hover:text-rose-300 transition-colors"
+                  title="Gửi đánh giá trải nghiệm hoặc báo cáo lỗi trực tiếp cho tác giả (phat7971@gmail.com)"
+                >
+                  <HeartHandshake className="w-4 h-4 text-rose-500" />
+                  <span>Đánh giá & Báo lỗi</span>
+                </button>
+              )}
             </nav>
           </div>
         </div>

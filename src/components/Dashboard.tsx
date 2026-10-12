@@ -20,6 +20,7 @@ import {
   AlertTriangle,
   Wand2,
   Headphones,
+  HeartHandshake,
 } from 'lucide-react';
 import { Card, Category, UserStats } from '../lib/types';
 import { isCardDue, filterDueCards } from '../lib/srs-engine';
@@ -53,6 +54,7 @@ interface DashboardProps {
   onOpenMistakes?: () => void;
   onOpenCardGenerator?: () => void;
   onOpenAudioFlashcard?: () => void;
+  onOpenFeedback?: () => void;
 }
 
 const CATEGORY_NAMES: Record<Category | 'all', string> = {
@@ -85,6 +87,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onOpenMistakes,
   onOpenCardGenerator,
   onOpenAudioFlashcard,
+  onOpenFeedback,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [previewCard, setPreviewCard] = useState<Card | null>(null);
@@ -267,6 +270,17 @@ export const Dashboard: React.FC<DashboardProps> = ({
             >
               <Wand2 className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
               <span className="hidden sm:inline">Tạo thẻ AI</span>
+            </button>
+          )}
+
+          {/* Feedback & Bug Report Button */}
+          {onOpenFeedback && (
+            <button
+              onClick={onOpenFeedback}
+              className="p-2 rounded-xl text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+              title="Gửi đánh giá hoặc báo lỗi trực tiếp cho tác giả (phat7971@gmail.com)"
+            >
+              <HeartHandshake className="w-5 h-5" />
             </button>
           )}
 

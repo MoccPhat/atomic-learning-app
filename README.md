@@ -1,59 +1,58 @@
-# ⚛️ Auto Learning - Intelligent Personal Workspace
+# Auto Learning - Personal Workspace
 
-> **Hệ thống học tập cá nhân nguyên tử thông minh (Atomic Learning App)** — Tối ưu hóa khả năng ghi nhớ dài hạn, số hóa tài liệu học tập và rèn luyện kỹ năng với mô hình **Offline-First**, hoạt động mượt mà trên cả **Máy tính (PC/Mac)** và **Điện thoại di động (iOS/Android)**.
+Ứng dụng hỗ trợ học tập cá nhân theo mô hình offline-first, tập trung vào kỹ thuật ghi nhớ ngắt quãng (SRS), số hóa tài liệu và luyện thi trắc nghiệm. Ứng dụng chạy trên nền web, tương thích với cả máy tính và thiết bị di động (hỗ trợ PWA).
 
 [![React](https://img.shields.io/badge/React-18.3-61dafb?style=flat&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.0-646cff?style=flat&logo=vite)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
-[![Vitest](https://img.shields.io/badge/Vitest-120%20Tests%20Passed-22c55e?style=flat&logo=vitest)](https://vitest.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-Passing-22c55e?style=flat&logo=vitest)](https://vitest.dev/)
 [![PWA](https://img.shields.io/badge/PWA-Ready-f59e0b?style=flat&logo=pwa)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
 
 ---
 
-## 🌟 Tính Năng Nổi Bật
+## Tính Năng Chính
 
-### 1. 🧠 Flashcard Nguyên Tử & Thuật Toán Lặp Lại Ngắt Quãng (SRS SM-2)
-- Áp dụng kỹ thuật **Active Recall** và thuật toán **Spaced Repetition (SuperMemo-2)** điều chỉnh chu kỳ ôn tập thông minh (1 - Quên, 2 - Khó, 3 - Nhớ, 4 - Dễ).
-- Phân nhóm 4 trụ cột kiến thức: **Lập trình (Code)**, **Ngoại ngữ (English)**, **Đọc sách (Books)**, và **Ôn thi cử (Exams)**.
-- Tích hợp **Web Speech API** phát âm giọng đọc từ vựng tiếng Anh chuẩn bản xứ.
-- Tạo thẻ siêu tốc (**Quick Capture**) trong 3 giây với phím tắt `Ctrl + K` hoặc `Ctrl + N`.
+### 1. Flashcard & Lặp lại ngắt quãng (SRS SM-2)
+- Thuật toán SuperMemo-2 (SM-2) tự động tính toán chu kỳ ôn tập dựa trên 4 mức đánh giá: Quên, Khó, Nhớ, Dễ.
+- Phân loại thẻ theo danh mục: Lập trình, Ngoại ngữ, Sách, Ôn thi.
+- Tích hợp Web Speech API hỗ trợ phát âm từ vựng tiếng Anh.
+- Phím tắt tạo thẻ nhanh: `Ctrl + K` hoặc `Ctrl + N`.
 
-### 2. 📝 Luyện Thi Trắc Nghiệm Thông Minh (Quiz Master & Mock Exam)
-- Phòng thi mô phỏng thực tế với đồng hồ đếm ngược, phân tích kết quả qua biểu đồ đa chiều **Radar Chart (SVG)**.
-- **Tính năng Đảo đáp án ngẫu nhiên (Shuffle Choices):** Xáo trộn linh hoạt các phương án A, B, C, D kèm đồng bộ phím tắt bàn phím và nhấp chuột, triệt tiêu thói quen học vẹt.
-- **Sổ tay lỗi sai thông minh (Mistake Notebook):** Tự động thu thập các câu trả lời sai để luyện tập phục thù.
+### 2. Thi trắc nghiệm (Quiz & Mock Exam)
+- Chế độ thi thử tính giờ và trực quan hóa kết quả theo từng chuyên đề bằng biểu đồ radar.
+- Tùy chọn đảo ngẫu nhiên thứ tự đáp án (A, B, C, D) kèm hỗ trợ phím tắt chọn nhanh.
+- Tự động tổng hợp các câu trả lời sai vào danh sách riêng để ôn luyện lại.
 
-### 3. 📷 Số Hóa Tài Liệu Học Tập (Scanner Machine Learning OCR)
-- **Mặc định Machine Learning Offline (Tesseract.js OCR):** Nhận diện chữ viết và văn bản trực tiếp trên trình duyệt mà không cần kết nối mạng hay khóa API.
-- Tùy chọn nâng cao **Cloud AI (Gemini Vision)** cho bài toán chữ viết tay phức tạp.
-- Tự động chuẩn hóa bố cục, trích xuất công thức toán học và mã nguồn.
+### 3. Số hóa tài liệu (OCR)
+- Nhận diện văn bản offline trực tiếp trên trình duyệt bằng Tesseract.js (không cần kết nối mạng hay API key).
+- Tùy chọn mở rộng qua Gemini Vision đối với tài liệu có chữ viết tay phức tạp.
+- Trích xuất văn bản, công thức và đoạn mã nguồn từ hình ảnh.
 
-### 4. 🗂️ Cây Lưu Trữ Tài Liệu Đa Cấp (Study Vault)
-- Quản lý tài liệu theo nhóm ngành học, môn học và phân loại định dạng tệp thông minh.
-- Đọc và tương tác với các định dạng phổ biến: `.pdf`, `.docx`, `.txt`, `.md`, `.csv`, `.json`.
-- Tích hợp công cụ **Highlight bút nhớ dòng** với nhiều màu sắc và trình tạo câu hỏi tức thì từ văn bản.
+### 4. Quản lý tài liệu (Study Vault)
+- Tổ chức tài liệu theo cây thư mục và môn học.
+- Hỗ trợ xem các định dạng: `.pdf`, `.docx`, `.txt`, `.md`, `.csv`, `.json`.
+- Công cụ highlight tài liệu và tạo câu hỏi nhanh từ nội dung được chọn.
 
-### 5. 💡 Các Phương Pháp Học Tập Đỉnh Cao
-- **Feynman Studio:** Giải thích các khái niệm phức tạp bằng ngôn từ đơn giản của đứa trẻ 10 tuổi.
-- **Cornell Notes Studio:** Ghi chép bài giảng theo cấu trúc 3 phần chuẩn (Cues, Notes, Summary).
-- **MindMap Studio:** Thiết kế và xuất sơ đồ tư duy vector SVG tương tác trực quan.
-- **CheatSheet Vault:** Bộ thẻ tra cứu nhanh cú pháp, công thức và lệnh tắt.
+### 5. Công cụ ghi chép & phương pháp học
+- Feynman: Ghi chép và diễn giải lại khái niệm theo cách đơn giản.
+- Cornell Notes: Ghi chú theo cấu trúc 3 phần (Gợi ý, Nội dung, Tóm tắt).
+- MindMap: Tạo và xuất sơ đồ tư duy dạng vector SVG.
+- CheatSheet: Bảng tra cứu nhanh cú pháp, công thức và phím tắt.
 
-### 6. ⏱️ Tập Trung & Game Hóa Thói Quen (Gamification)
-- **Đồng hồ Pomodoro:** Tùy biến chu kỳ tập trung 25/5/15 phút với âm thanh báo hiệu.
-- **Focus Garden & Focus Pet:** Trồng cây xanh và nuôi thú cưng tiến hóa theo thời gian học tập thực tế.
-- **Study Heatmap & Streak:** Bản đồ nhiệt đóng góp kiến thức theo phong cách GitHub kèm hệ số chuỗi ngày học liên tục.
-- **Hệ thống Huy hiệu Thành tích (Achievements):** Mở khóa danh hiệu và điểm thưởng danh dự.
+### 6. Theo dõi học tập
+- Đồng hồ Pomodoro tùy chỉnh khoảng thời gian làm việc/nghỉ ngơi kèm âm thanh thông báo.
+- Thống kê thời gian học, chuỗi ngày học liên tục (streak) và biểu đồ hoạt động.
+- Hệ thống mốc thành tích ghi nhận tiến độ học tập.
 
 ---
 
-## 🚀 Hướng Dẫn Cài Đặt & Chạy Trên Máy Tính (PC / Mac)
+## Hướng Dẫn Cài Đặt (PC / Mac)
 
-### Yêu Cầu Hệ Thống:
-- Đã cài đặt [Node.js](https://nodejs.org/) (khuyến nghị phiên bản 18 LTS trở lên).
+### Yêu cầu hệ thống:
+- Node.js phiên bản 18 trở lên.
 
-### Các Bước Thực Hiện:
+### Cài đặt và khởi chạy:
 ```bash
 # 1. Tải mã nguồn về máy
 git clone https://github.com/<tai-khoan-cua-ban>/atomic-learning-app.git
@@ -61,77 +60,65 @@ git clone https://github.com/<tai-khoan-cua-ban>/atomic-learning-app.git
 # 2. Di chuyển vào thư mục dự án
 cd atomic-learning-app
 
-# 3. Cài đặt các thư viện phụ thuộc
+# 3. Cài đặt các gói phụ thuộc
 npm install
 
-# 4. Khởi chạy môi trường phát triển (Dev Server)
+# 4. Chạy môi trường phát triển
 npm run dev
 ```
 
-Mở trình duyệt và truy cập vào đường dẫn:
-👉 **`http://localhost:5173`**
+Truy cập ứng dụng tại: `http://localhost:5173`
 
 ---
 
-## 📱 Hướng Dẫn Sử Dụng Trên Điện Thoại (iOS & Android)
+## Sử Dụng Trên Điện Thoại (iOS & Android)
 
-Ứng dụng được thiết kế tương thích hoàn hảo cho điện thoại di động (Responsive 100%) và hỗ trợ chuẩn **Progressive Web App (PWA)**:
+Ứng dụng tương thích responsive cho màn hình di động và hỗ trợ chuẩn Progressive Web App (PWA):
 
-### Cách 1: Sử dụng trong mạng nội bộ WiFi (Dễ nhất khi đang chạy trên PC)
-1. Đảm bảo điện thoại và máy tính kết nối **chung một mạng WiFi**.
-2. Khi chạy lệnh `npm run dev` trên máy tính, terminal sẽ thông báo địa chỉ mạng nội bộ, ví dụ:
+### Cách 1: Chạy trong mạng Wi-Fi nội bộ
+1. Đảm bảo điện thoại và máy tính kết nối chung một mạng Wi-Fi.
+2. Terminal khi chạy `npm run dev` sẽ cung cấp địa chỉ mạng nội bộ, ví dụ:
    ```text
-   ➜  Local:   http://localhost:5173/
-   ➜  Network: http://192.168.1.15:5173/
+   Local:   http://localhost:5173/
+   Network: http://192.168.1.15:5173/
    ```
-3. Mở trình duyệt trên điện thoại và gõ địa chỉ `http://192.168.x.x:5173/`.
+3. Mở trình duyệt trên điện thoại và nhập địa chỉ mạng nội bộ tương ứng.
 
-### Cách 2: Triển khai lên Vercel / Netlify / Cloudflare Pages (Khuyên dùng để dùng mọi lúc mọi nơi)
-Bạn có thể đưa trang web lên dịch vụ hosting miễn phí chỉ trong 2 phút:
-1. Đẩy mã nguồn lên GitHub repository cá nhân.
-2. Đăng nhập [Vercel.com](https://vercel.com) hoặc [Netlify.com](https://netlify.com) bằng tài khoản GitHub.
-3. Chọn repo `atomic-learning-app` và nhấn **Deploy** (hệ thống sẽ tự nhận diện Vite và build).
-4. Bạn sẽ có ngay một đường link công khai dạng `https://ten-ung-dung.vercel.app` để truy cập từ bất kỳ điện thoại hay thiết bị nào!
+### Cách 2: Triển khai lên Vercel / Netlify / Cloudflare Pages
+1. Đẩy mã nguồn lên kho lưu trữ GitHub.
+2. Kết nối tài khoản GitHub với Vercel hoặc Netlify.
+3. Chọn repository và tiến hành Deploy với cấu hình mặc định của Vite.
+4. Truy cập qua URL công khai do dịch vụ cung cấp.
 
-### 📲 Cài đặt ứng dụng lên Màn hình chính điện thoại (PWA Standalone App):
-- **Trên iPhone / iPad (Safari):**
-  1. Mở link ứng dụng trên trình duyệt **Safari**.
-  2. Bấm vào nút **Chia sẻ** (biểu tượng hình vuông có mũi tên trỏ lên ở thanh dưới).
-  3. Cuộn xuống và chọn **"Thêm vào MH chính" (Add to Home Screen)**.
-- **Trên Android (Chrome / Brave / Edge):**
-  1. Mở link ứng dụng trên trình duyệt **Chrome**.
-  2. Bấm vào menu **3 chấm** ở góc trên bên phải.
-  3. Chọn **"Cài đặt ứng dụng"** hoặc **"Thêm vào màn hình chính"**.
-
-> 💡 *Sau khi thêm, bạn có thể mở ứng dụng như một app thông thường không có thanh địa chỉ trình duyệt, hoạt động ngoại tuyến (Offline) ngay cả khi mất mạng!*
+### Cài đặt dạng PWA (Standalone) trên màn hình chính:
+- **iOS (Safari):** Mở liên kết trên Safari > chọn biểu tượng **Chia sẻ** (Share) > chọn **Thêm vào MH chính** (Add to Home Screen).
+- **Android (Chrome):** Mở liên kết trên Chrome > chọn menu **3 chấm** > chọn **Cài đặt ứng dụng** hoặc **Thêm vào màn hình chính**.
 
 ---
 
-## 🧪 Kiểm Thử & Đóng Gói (Testing & Build)
-
-Dự án áp dụng quy chuẩn kỹ thuật nghiêm ngặt, tuân thủ nguyên tắc Clean Code và kiểm thử tự động toàn diện:
+## Kiểm Thử & Đóng Gói
 
 ```bash
-# Chạy bộ kiểm thử tự động Vitest (120 test cases)
+# Chạy bộ kiểm thử tự động với Vitest
 npm test
 
-# Kiểm tra cú pháp TypeScript và đóng gói bản phát hành Production
+# Kiểm tra kiểu dữ liệu TypeScript và build bản production
 npm run build
 
-# Chạy thử bản build production trên máy
+# Xem trước bản build production trên máy local
 npm run preview
 ```
 
 ---
 
-## 🔒 Cam Kết Bảo Mật & Quyền Riêng Tư (Privacy First)
+## Quản Lý Dữ Liệu & Quyền Riêng Tư
 
-- **100% Offline-First:** Toàn bộ thẻ nhớ, tài liệu, kết quả thi cử, ghi chú và lịch sử đều được lưu trữ an toàn trong trình duyệt của bạn qua **LocalStorage** và **IndexedDB**.
-- **Không thu thập dữ liệu cá nhân:** Không có máy chủ trung gian theo dõi hay lưu giữ kiến thức của bạn.
-- **Sao lưu & Phục hồi dễ dàng:** Tính năng Cài đặt hỗ trợ xuất/nhập toàn bộ dữ liệu ra tệp JSON bất kỳ lúc nào để chuyển đổi sang máy khác.
+- **Offline-First:** Toàn bộ thẻ ghi nhớ, tài liệu, ghi chú và lịch sử học tập được lưu cục bộ trên trình duyệt qua LocalStorage và IndexedDB.
+- **Không thu thập dữ liệu:** Ứng dụng không sử dụng máy chủ trung gian để lưu trữ dữ liệu cá nhân của người dùng.
+- **Sao lưu dữ liệu:** Trong phần Cài đặt có tính năng xuất (export) và nhập (import) toàn bộ dữ liệu dưới dạng file JSON để sao lưu hoặc chuyển đổi thiết bị.
 
 ---
 
-## 📄 Giấy Phép & Bản Quyền
+## Giấy Phép
 
-Dự án phát triển phục vụ mục đích học tập cá nhân và cộng đồng. Được phát hành theo giấy phép [MIT License](LICENSE).
+Phát hành theo giấy phép [MIT License](LICENSE).

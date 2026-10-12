@@ -16,6 +16,7 @@ import {
   Undo2,
   Save,
   Database,
+  HeartHandshake,
 } from 'lucide-react';
 import { exportDataAsJSON, importDataFromJSON, resetToSeedData } from '../lib/storage';
 import {
@@ -40,9 +41,10 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDataChanged: () => void;
+  onOpenFeedback?: () => void;
 }
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onDataChanged }) => {
+export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onDataChanged, onOpenFeedback }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<'appearance' | 'ai' | 'data'>('appearance');
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -908,6 +910,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
               >
                 <Save className="w-4 h-4" />
                 <span>{isSaved ? '✓ Đã lưu dính cứng!' : 'Lưu cài đặt (Dính cứng vĩnh viễn)'}</span>
+              </button>
+            )}
+
+            {onOpenFeedback && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenFeedback();
+                }}
+                className="px-4 py-2 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-xs font-bold transition-all flex items-center gap-1.5"
+                title="Gửi phản hồi hoặc báo lỗi cho tác giả (phat7971@gmail.com)"
+              >
+                <HeartHandshake className="w-4 h-4 text-rose-500" />
+                <span>Đánh giá / Báo lỗi</span>
               </button>
             )}
           </div>
