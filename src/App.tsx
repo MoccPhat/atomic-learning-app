@@ -31,6 +31,7 @@ import { getCheatSheets } from './lib/cheatsheet-storage';
 import { MistakeNotebookModal } from './components/mistakes/MistakeNotebookModal';
 import { InstantCardGeneratorModal } from './components/tools/InstantCardGeneratorModal';
 import { AudioFlashcardModal } from './components/flashcards/AudioFlashcardModal';
+import { MobileBottomNav } from './components/navigation/MobileBottomNav';
 import { addQuizSetFromText } from './lib/quiz-storage';
 import { MistakeItem } from './lib/mistakes-types';
 
@@ -252,7 +253,7 @@ export default function App() {
 
           {/* Vùng nội dung chính */}
           <main
-            className={`flex-1 transition-all duration-300 ease-in-out ${
+            className={`flex-1 transition-all duration-300 ease-in-out pb-24 lg:pb-8 ${
               isSidebarOpen ? 'lg:pl-72' : 'lg:pl-0'
             }`}
           >
@@ -436,6 +437,19 @@ export default function App() {
               </div>
             )}
           </main>
+
+          {/* Thanh điều hướng cố định dưới đáy màn hình trên Mobile */}
+          <MobileBottomNav
+            activeTab={activeTab}
+            onSelectTab={(tab) => {
+              setActiveTab(tab);
+              reloadData();
+            }}
+            onOpenMenu={() => setIsSidebarOpen(true)}
+            dueCount={dueCards.length}
+            quizCount={quizCount}
+            onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
+          />
         </div>
       )}
 

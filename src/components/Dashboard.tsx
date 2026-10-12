@@ -190,7 +190,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {onOpenScanner && (
             <button
               onClick={onOpenScanner}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs shadow-xs hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-all active:scale-95"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs shadow-xs hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-all active:scale-95"
               title="Quét & số hóa tài liệu ảnh với AI Vision"
             >
               <ScanText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -202,7 +202,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {onOpenPomodoro && (
             <button
               onClick={onOpenPomodoro}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200/80 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs shadow-xs hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-all active:scale-95"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200/80 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs shadow-xs hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-all active:scale-95"
               title="Đồng hồ Pomodoro & Âm thanh tập trung"
             >
               <Clock className="w-3.5 h-3.5 text-rose-500" />
@@ -214,7 +214,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {onOpenCornell && (
             <button
               onClick={onOpenCornell}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-900/60 text-amber-700 dark:text-amber-300 font-bold text-xs shadow-xs hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all active:scale-95"
+              className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-900/60 text-amber-700 dark:text-amber-300 font-bold text-xs shadow-xs hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all active:scale-95"
               title="Trình Ghi Chú Chuẩn Cornell (3 Vùng)"
             >
               <FileText className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
@@ -226,7 +226,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {onOpenAdvisor && (
             <button
               onClick={onOpenAdvisor}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-xs shadow-xs hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all active:scale-95"
+              className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-900/60 text-blue-700 dark:text-blue-300 font-bold text-xs shadow-xs hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all active:scale-95"
               title="Trợ Lý Lộ Trình & Nhắc Nhở Học Tập Thông Minh"
             >
               <Compass className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
@@ -238,7 +238,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {onOpenMindmap && (
             <button
               onClick={onOpenMindmap}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs shadow-xs hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-all active:scale-95"
+              className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs shadow-xs hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-all active:scale-95"
               title="Sơ Đồ Tư Duy Trực Quan (Mindmap)"
             >
               <Network className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -250,7 +250,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {onOpenMistakes && (
             <button
               onClick={onOpenMistakes}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200/80 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs shadow-xs hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-all active:scale-95"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200/80 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-xs shadow-xs hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-all active:scale-95"
               title="Sổ Tay Lỗi Sai & Sát Hạch Phục Thù"
             >
               <AlertTriangle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
@@ -262,7 +262,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {onOpenCardGenerator && (
             <button
               onClick={onOpenCardGenerator}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-brand-50 to-indigo-50 dark:from-brand-950/60 dark:to-indigo-950/60 border border-brand-200/80 dark:border-brand-900/60 text-brand-700 dark:text-brand-300 font-bold text-xs shadow-xs hover:from-brand-100 hover:to-indigo-100 transition-all active:scale-95"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-brand-50 to-indigo-50 dark:from-brand-950/60 dark:to-indigo-950/60 border border-brand-200/80 dark:border-brand-900/60 text-brand-700 dark:text-brand-300 font-bold text-xs shadow-xs hover:from-brand-100 hover:to-indigo-100 transition-all active:scale-95"
               title="Rút trích Flashcard & Quiz tự động từ tài liệu"
             >
               <Wand2 className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
@@ -306,12 +306,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
               {onOpenAudioFlashcard && cards.length > 0 && (
                 <button
                   type="button"
                   onClick={onOpenAudioFlashcard}
-                  className="flex items-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 shadow-md transition-all active:scale-95 whitespace-nowrap"
+                  className="flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 shadow-md transition-all active:scale-95 whitespace-nowrap w-full sm:w-auto"
                   title="Nghe audio phát thanh câu hỏi & câu trả lời rảnh tay"
                 >
                   <Headphones className="w-4 h-4 text-emerald-400" />
@@ -322,7 +322,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <button
                 onClick={onStartReview}
                 disabled={dueCards.length === 0}
-                className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-black text-sm tracking-wide shadow-lg transition-all active:scale-95 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-black text-sm tracking-wide shadow-lg transition-all active:scale-95 whitespace-nowrap w-full sm:w-auto ${
                   dueCards.length > 0
                     ? 'bg-brand-500 hover:bg-brand-400 text-slate-950 shadow-brand-500/30 cursor-pointer'
                     : 'bg-slate-700 text-slate-400 cursor-not-allowed opacity-60'
