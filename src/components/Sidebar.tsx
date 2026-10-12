@@ -218,25 +218,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <span>{cat.label}</span>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
-                      {catDue > 0 && (
-                        <span
-                          className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-brand-500 text-slate-950 font-mono shadow-xs"
-                          title={`${catDue} thẻ đến hạn cần ôn`}
-                        >
-                          {catDue}
-                        </span>
-                      )}
+                    {catDue > 0 ? (
+                      <span
+                        className="text-[10px] font-black px-2 py-0.5 rounded-full bg-brand-500 text-slate-950 font-mono shadow-xs"
+                        title={`${catDue} thẻ đến hạn cần ôn (trong tổng số ${count} thẻ)`}
+                      >
+                        {catDue}
+                      </span>
+                    ) : (
                       <span
                         className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
                           isSelected
                             ? 'bg-brand-200/70 dark:bg-brand-900/70 text-brand-800 dark:text-brand-200'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
                         }`}
+                        title={`${count} thẻ`}
                       >
                         {count}
                       </span>
-                    </div>
+                    )}
                   </button>
                 );
               })}
