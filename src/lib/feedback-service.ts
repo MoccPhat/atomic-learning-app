@@ -14,6 +14,7 @@ export interface FeedbackData {
   title: string;
   description: string;
   includeDiagnostics: boolean;
+  imageFile?: File | null;
 }
 
 export interface DeviceDiagnostics {
@@ -27,6 +28,7 @@ export interface DeviceDiagnostics {
 }
 
 export const TARGET_EMAIL = 'phat7971@gmail.com';
+export const FORMSUBMIT_TOKEN = 'edc7294158184bd78f198a1de7db4d8f';
 
 export const FEEDBACK_TYPE_LABELS: Record<FeedbackType, { label: string; icon: string; desc: string }> = {
   bug: {
@@ -74,36 +76,39 @@ export function getDeviceDiagnostics(): DeviceDiagnostics {
 }
 
 /**
- * Gửi phản hồi tự động về email qua dịch vụ FormSubmit (Miễn phí, không cần server riêng)
+ * Gửi phản hồi tự động về email qua dịch vụ FormSubmit (Hỗ trợ kèm tệp hình ảnh minh họa)
  */
 export async function sendFeedbackViaFormSubmit(
   feedback: FeedbackData,
-  targetEmail: string = TARGET_EMAIL
+  targetEndpoint: string = FORMSUBMIT_TOKEN || TARGET_EMAIL
 ): Promise<{ success: boolean; message: string }> {
   const diagnostics = feedback.includeDiagnostics ? getDeviceDiagnostics() : null;
   const typeInfo = FEEDBACK_TYPE_LABELS[feedback.type] || { label: feedback.type, icon: '📝' };
 
-  const payload = {
-    name: feedback.userName?.trim() || 'Người dùng ẩn danh',
-    email: feedback.userEmail?.trim() || 'no-reply@autolearning.pwa',
-    _subject: `[Auto Learning] ${typeInfo.icon} ${typeInfo.label}: ${feedback.title.trim()} (${feedback.rating} sao)`,
-    Loại_Phản_Hồi: `${typeInfo.icon} ${typeInfo.label}`,
-    Đánh_Giá: `${'⭐'.repeat(feedback.rating)} (${feedback.rating}/5 sao)`,
-    Tiêu_Đề: feedback.title.trim(),
-    Nội_Dung_Chi_Tiết: feedback.description.trim(),
-    Thông_Tin_Thiết_Bị: diagnostics ? JSON.stringify(diagnostics, null, 2) : 'Người dùng không đính kèm',
-    _template: 'table',
-    _captcha: 'false',
-  };
+  const formData = new FormData();
+  formData.append('name', feedback.userName?.trim() || 'Người dùng ẩn danh');
+  formData.append('email', feedback.userEmail?.trim() || 'no-reply@autolearning.pwa');
+  formData.append('_subject', `[Auto Learning] ${typeInfo.icon} ${typeInfo.label}: ${feedback.title.trim()} (${feedback.rating} sao)`);
+  formData.append('Loại_Phản_Hồi', `${typeInfo.icon} ${typeInfo.label}`);
+  formData.append('Đánh_Giá', `${'⭐'.repeat(feedback.rating)} (${feedback.rating}/5 sao)`);
+  formData.append('Tiêu_Đề', feedback.title.trim());
+  formData.append('Nội_Dung_Chi_Tiết', feedback.description.trim());
+  formData.append('Thông_Tin_Thiết_Bị', diagnostics ? JSON.stringify(diagnostics, null, 2) : 'Người dùng không đính kèm');
+  formData.append('_template', 'table');
+  formData.append('_captcha', 'false');
+
+  if (feedback.imageFile) {
+    formData.append('attachment', feedback.imageFile);
+    formData.append('Tên_Hình_Ảnh', `${feedback.imageFile.name} (${(feedback.imageFile.size / 1024).toFixed(1)} KB)`);
+  }
 
   try {
-    const res = await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
+    const res = await fetch(`https://formsubmit.co/ajax/${targetEndpoint}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-      body: JSON.stringify(payload),
+      body: formData,
     });
 
     if (!res.ok) {
@@ -115,7 +120,7 @@ export async function sendFeedbackViaFormSubmit(
       if (typeof data.message === 'string' && data.message.includes('Activation')) {
         return {
           success: true,
-          message: 'Liên kết kích hoạt đã được gửi đến email tác giả. Sau khi bấm kích hoạt trong email, hệ thống sẽ tự động nhận mọi phản hồi!',
+          message: 'Hệ thống đã gửi liên kết kích hoạt đến email tác giả. Sau khi bấm kích hoạt trong email, hệ thống sẽ tự động nhận mọi phản hồi!',
         };
       }
       return {
@@ -126,7 +131,7 @@ export async function sendFeedbackViaFormSubmit(
 
     return {
       success: true,
-      message: data.message || 'Cảm ơn bạn! Đánh giá đã được gửi trực tiếp đến tác giả.',
+      message: data.message || 'Cảm ơn bạn! Đánh giá và hình ảnh đã được gửi trực tiếp đến tác giả.',
     };
   } catch (error: any) {
     console.warn('Lỗi khi gửi qua FormSubmit:', error);
@@ -153,6 +158,10 @@ export function generateMailtoLink(feedback: FeedbackData, targetEmail: string =
   body += `- Người gửi: ${feedback.userName || 'Ẩn danh'}\n\n`;
   body += `Nội dung chi tiết:\n${feedback.description}\n\n`;
 
+  if (feedback.imageFile) {
+    body += `\n* Lưu ý: Bạn đã chọn tệp ảnh "${feedback.imageFile.name}". Vui lòng đính kèm tệp này vào email trước khi bấm Gửi.\n`;
+  }
+
   if (diagnostics) {
     body += `---\n`;
     body += `Thông tin thiết bị chẩn đoán:\n`;
@@ -178,6 +187,10 @@ export function generateClipboardReport(feedback: FeedbackData): string {
   report += `• Phân loại: ${typeInfo.icon} ${typeInfo.label}\n`;
   report += `• Người gửi: ${feedback.userName || 'Ẩn danh'}\n`;
   report += `• Chi tiết:\n${feedback.description}\n`;
+
+  if (feedback.imageFile) {
+    report += `\n📷 [ẢNH ĐÍNH KÈM]: Đã chọn tệp "${feedback.imageFile.name}" (${(feedback.imageFile.size / 1024).toFixed(1)} KB) - Vui lòng gửi kèm file ảnh này khi gửi tin nhắn.\n`;
+  }
 
   if (diagnostics) {
     report += `\n🔧 [THIẾT BỊ]\n`;

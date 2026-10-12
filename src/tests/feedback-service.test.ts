@@ -5,6 +5,7 @@ import {
   generateClipboardReport,
   sendFeedbackViaFormSubmit,
   TARGET_EMAIL,
+  FORMSUBMIT_TOKEN,
   FeedbackData,
 } from '../lib/feedback-service';
 
@@ -34,6 +35,15 @@ describe('Feedback Service Tests', () => {
     expect(mailto).toContain(encodeURIComponent('Thử Nghiệm Viên'));
   });
 
+  it('tạo link mailto có thông báo đính kèm ảnh khi có imageFile', () => {
+    const feedbackWithImage: FeedbackData = {
+      ...sampleFeedback,
+      imageFile: new File(['fake content'], 'screenshot.png', { type: 'image/png' }),
+    };
+    const mailto = generateMailtoLink(feedbackWithImage);
+    expect(mailto).toContain(encodeURIComponent('screenshot.png'));
+  });
+
   it('tạo báo cáo văn bản để sao chép Zalo/Telegram chuẩn định dạng', () => {
     const report = generateClipboardReport(sampleFeedback);
     expect(report).toContain('[AUTO LEARNING FEEDBACK]');
@@ -43,21 +53,68 @@ describe('Feedback Service Tests', () => {
     expect(report).toContain('Thanh cuộn ngang xuất hiện khi mở bảng nhiệt.');
   });
 
-  it('gửi phản hồi thành công qua FormSubmit khi API phản hồi 200', async () => {
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ success: 'true', message: 'Email đã được gửi thành công' }),
+  it('tạo báo cáo văn bản có ghi chú ảnh đính kèm khi có imageFile', () => {
+    const feedbackWithImage: FeedbackData = {
+      ...sampleFeedback,
+      imageFile: new File(['fake content'], 'error-sample.png', { type: 'image/png' }),
+    };
+    const report = generateClipboardReport(feedbackWithImage);
+    expect(report).toContain('error-sample.png');
+    expect(report).toContain('[ẢNH ĐÍNH KÈM]');
+  });
+
+  it('gửi phản hồi thành công qua FormSubmit Token khi API phản hồi 200', async () => {
+    let capturedBody: FormData | null = null;
+    const mockFetch = vi.fn().mockImplementation((_url, options) => {
+      capturedBody = options.body;
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ success: 'true', message: 'Email đã được gửi thành công' }),
+      });
     });
     vi.stubGlobal('fetch', mockFetch);
 
     const result = await sendFeedbackViaFormSubmit(sampleFeedback);
     expect(result.success).toBe(true);
     expect(mockFetch).toHaveBeenCalledWith(
-      `https://formsubmit.co/ajax/${TARGET_EMAIL}`,
+      `https://formsubmit.co/ajax/${FORMSUBMIT_TOKEN}`,
       expect.objectContaining({
         method: 'POST',
       })
     );
+
+    expect(capturedBody).not.toBeNull();
+    const body = capturedBody as unknown as FormData;
+    expect(body.get('name')).toBe('Thử Nghiệm Viên');
+    expect(body.get('email')).toBe('tester@example.com');
+    expect(body.get('Tiêu_Đề')).toBe('Lỗi tràn màn hình trên Safari');
+
+    vi.unstubAllGlobals();
+  });
+
+  it('đính kèm đúng trường attachment và tên hình ảnh vào FormData khi có tệp ảnh', async () => {
+    let capturedBody: FormData | null = null;
+    const mockFetch = vi.fn().mockImplementation((_url, options) => {
+      capturedBody = options.body;
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ success: 'true', message: 'Tệp và đánh giá đã được gửi' }),
+      });
+    });
+    vi.stubGlobal('fetch', mockFetch);
+
+    const testFile = new File(['fake-png-binary-data'], 'man-hinh-loi.png', { type: 'image/png' });
+    const feedbackWithImage: FeedbackData = {
+      ...sampleFeedback,
+      imageFile: testFile,
+    };
+
+    const result = await sendFeedbackViaFormSubmit(feedbackWithImage);
+    expect(result.success).toBe(true);
+    expect(capturedBody).not.toBeNull();
+    const body = capturedBody as unknown as FormData;
+    expect(body.get('attachment')).toBe(testFile);
+    expect(body.get('Tên_Hình_Ảnh')).toContain('man-hinh-loi.png');
 
     vi.unstubAllGlobals();
   });

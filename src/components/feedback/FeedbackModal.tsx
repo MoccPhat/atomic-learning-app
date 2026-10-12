@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   X,
   Star,
@@ -10,6 +10,9 @@ import {
   Smartphone,
   CheckCircle2,
   HeartHandshake,
+  Image as ImageIcon,
+  Upload,
+  Trash2,
 } from 'lucide-react';
 import {
   FeedbackData,
@@ -43,13 +46,15 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
   const [includeDiagnostics, setIncludeDiagnostics] = useState<boolean>(true);
   const [showDiagnosticsPreview, setShowDiagnosticsPreview] = useState<boolean>(false);
 
+  // === HÌNH ẢNH MINH HỌA / ẢNH CHỤP MÀN HÌNH ===
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-  if (!isOpen) return null;
-
-  const currentDiagnostics = getDeviceDiagnostics();
 
   const getRatingLabel = (stars: number) => {
     switch (stars) {
@@ -67,6 +72,70 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
     }
   };
 
+  const handleSelectFile = (file: File) => {
+    setImageError(null);
+    if (!file.type.startsWith('image/')) {
+      setImageError('Chỉ chấp nhận tệp hình ảnh (PNG, JPG, JPEG, WEBP, GIF)');
+      return;
+    }
+    // Giới hạn 5MB để gửi FormSubmit mượt mà
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      setImageError(`Dung lượng ảnh vượt quá 5MB (${(file.size / (1024 * 1024)).toFixed(1)}MB). Vui lòng chọn ảnh nhỏ hơn.`);
+      return;
+    }
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+    setImageFile(file);
+    setImagePreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleRemoveImage = () => {
+    if (imagePreviewUrl) {
+      URL.revokeObjectURL(imagePreviewUrl);
+    }
+    setImageFile(null);
+    setImagePreviewUrl(null);
+    setImageError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Hỗ trợ dán ảnh trực tiếp từ Clipboard (Ctrl + V)
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      if (!isOpen) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.startsWith('image/')) {
+          const file = items[i].getAsFile();
+          if (file) {
+            handleSelectFile(file);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [isOpen]);
+
+  // Dọn dẹp preview URL
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
+
+  if (!isOpen) return null;
+
+  const currentDiagnostics = getDeviceDiagnostics();
+
   const currentFeedbackData: FeedbackData = {
     type,
     rating,
@@ -75,6 +144,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
     title: title.trim() || `${FEEDBACK_TYPE_LABELS[type].label} - ${rating} sao`,
     description: description.trim(),
     includeDiagnostics,
+    imageFile,
   };
 
   // Xử lý gửi trực tiếp qua FormSubmit
@@ -304,7 +374,93 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
             />
           </div>
 
-          {/* 5. Thông tin người gửi (Tùy chọn) */}
+          {/* 5. Tải ảnh minh họa / Ảnh chụp màn hình */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                <ImageIcon className="w-3.5 h-3.5 text-rose-500" />
+                <span>Hình ảnh minh họa / Ảnh chụp màn hình:</span>
+              </label>
+              <span className="text-[11px] text-slate-400 font-normal">Tùy chọn • Tối đa 5MB</span>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleSelectFile(e.target.files[0]);
+                }
+              }}
+            />
+
+            {imageFile && imagePreviewUrl ? (
+              <div className="p-3 rounded-2xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 flex items-center justify-between gap-3 animate-fade-in">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-rose-200 dark:border-rose-800 shrink-0 bg-slate-900">
+                    <img
+                      src={imagePreviewUrl}
+                      alt="Ảnh minh họa đính kèm"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                      {imageFile.name}
+                    </div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-0.5">
+                      <span>{(imageFile.size / 1024).toFixed(0)} KB</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                        ✓ Sẵn sàng gửi kèm vào email
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="p-2 rounded-xl text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/50 transition-colors shrink-0"
+                  title="Xóa ảnh này"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    handleSelectFile(e.dataTransfer.files[0]);
+                  }
+                }}
+                className="group p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700/80 hover:border-rose-400 dark:hover:border-rose-500/60 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-rose-50/30 dark:hover:bg-rose-950/20 transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 text-center"
+              >
+                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700/70 group-hover:bg-rose-100 dark:group-hover:bg-rose-900/40 text-slate-400 group-hover:text-rose-500 flex items-center justify-center transition-colors">
+                  <Upload className="w-4 h-4" />
+                </div>
+                <div className="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                  Bấm để chọn ảnh hoặc kéo thả vào đây
+                </div>
+                <div className="text-[11px] text-slate-400 dark:text-slate-500">
+                  Hỗ trợ dán ảnh trực tiếp từ bộ nhớ tạm (Ctrl + V) • PNG, JPG, WEBP
+                </div>
+              </div>
+            )}
+
+            {imageError && (
+              <p className="text-[11px] font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1 animate-fade-in">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>{imageError}</span>
+              </p>
+            )}
+          </div>
+
+          {/* 6. Thông tin người gửi (Tùy chọn) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div className="space-y-1">
               <label className="block text-xs font-medium text-slate-600 dark:text-slate-400">
