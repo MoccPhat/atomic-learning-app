@@ -111,6 +111,19 @@ export async function sendFeedbackViaFormSubmit(
     }
 
     const data = await res.json();
+    if (data.success === 'false' || data.success === false) {
+      if (typeof data.message === 'string' && data.message.includes('Activation')) {
+        return {
+          success: true,
+          message: 'Liên kết kích hoạt đã được gửi đến email tác giả. Sau khi bấm kích hoạt trong email, hệ thống sẽ tự động nhận mọi phản hồi!',
+        };
+      }
+      return {
+        success: false,
+        message: data.message || 'Không thể gửi phản hồi. Vui lòng thử lại sau.',
+      };
+    }
+
     return {
       success: true,
       message: data.message || 'Cảm ơn bạn! Đánh giá đã được gửi trực tiếp đến tác giả.',
