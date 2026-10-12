@@ -1,0 +1,46 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="kaiBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#0B132B" />
+      <stop offset="50%" stopColor="#1C2541" />
+      <stop offset="100%" stopColor="#0F172A" />
+    </linearGradient>
+    <linearGradient id="kaiBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#10B981" />
+      <stop offset="50%" stopColor="#06B6D4" />
+      <stop offset="100%" stopColor="#6366F1" />
+    </linearGradient>
+    <linearGradient id="kaiStem" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stopColor="#34D399" />
+      <stop offset="50%" stopColor="#10B981" />
+      <stop offset="100%" stopColor="#059669" />
+    </linearGradient>
+    <linearGradient id="kaiUpper" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="#10B981" />
+      <stop offset="50%" stopColor="#06B6D4" />
+      <stop offset="100%" stopColor="#38BDF8" />
+    </linearGradient>
+    <linearGradient id="kaiLower" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#06B6D4" />
+      <stop offset="60%" stopColor="#6366F1" />
+      <stop offset="100%" stopColor="#8B5CF6" />
+    </linearGradient>
+  </defs>
+
+  <rect x="3" y="3" width="94" height="94" rx="24" fill="url(#kaiBg)" stroke="url(#kaiBorder)" stroke-width="2.5" />
+  
+  <!-- I Pillar -->
+  <rect x="22" y="22" width="13" height="56" rx="6.5" fill="url(#kaiStem)" />
+  <rect x="24.5" y="25" width="4" height="50" rx="2" fill="#FFFFFF" opacity="0.35" />
+
+  <!-- K Upper -->
+  <path d="M 43 46 L 66 23 C 68.5 20.5 72.5 20.5 75 23 C 77.5 25.5 77.5 29.5 75 32 L 55 52 C 52.5 54.5 48.5 54.5 46 52 L 43 49 Z" fill="url(#kaiUpper)" />
+
+  <!-- K Lower -->
+  <path d="M 46 48 C 48.5 45.5 52.5 45.5 55 48 L 75 68 C 77.5 70.5 77.5 74.5 75 77 C 72.5 79.5 68.5 79.5 66 77 L 43 54 Z" fill="url(#kaiLower)" />
+
+  <!-- AI Neural Core -->
+  <circle cx="47" cy="50" r="4.5" fill="#FFFFFF" />
+  <circle cx="47" cy="50" r="2.5" fill="#06B6D4" />
+  <circle cx="78" cy="20" r="2.5" fill="#38BDF8" opacity="0.8" />
+</svg>

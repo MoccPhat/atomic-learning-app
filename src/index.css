@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --app-bg: #f8fafc;
+  --app-fg: #0f172a;
+  --app-gradient: none;
+  --brand-50: #f0fdf4;
+  --brand-100: #dcfce7;
+  --brand-500: #22c55e;
+  --brand-600: #16a34a;
+  --brand-700: #15803d;
+}
+
+html.dark {
+  --app-bg: #090d16;
+  --app-fg: #ffffff;
+  --app-gradient: none;
+}
+
+[data-accent="emerald"] {
+  --brand-50: #f0fdf4;
+  --brand-100: #dcfce7;
+  --brand-500: #22c55e;
+  --brand-600: #16a34a;
+  --brand-700: #15803d;
+}
+
+[data-accent="blue"] {
+  --brand-50: #eff6ff;
+  --brand-100: #dbeafe;
+  --brand-500: #3b82f6;
+  --brand-600: #2563eb;
+  --brand-700: #1d4ed8;
+}
+
+[data-accent="purple"] {
+  --brand-50: #faf5ff;
+  --brand-100: #f3e8ff;
+  --brand-500: #a855f7;
+  --brand-600: #9333ea;
+  --brand-700: #7e22ce;
+}
+
+[data-accent="amber"] {
+  --brand-50: #fffbeb;
+  --brand-100: #fef3c7;
+  --brand-500: #f59e0b;
+  --brand-600: #d97706;
+  --brand-700: #b45309;
+}
+
+[data-accent="rose"] {
+  --brand-50: #fff1f2;
+  --brand-100: #ffe4e6;
+  --brand-500: #f43f5e;
+  --brand-600: #e11d48;
+  --brand-700: #be123c;
+}
+
+html.contrast-strong div[class*="border-slate-200"],
+html.contrast-strong div[class*="border-slate-800"],
+html.contrast-strong aside,
+html.contrast-strong section {
+  border-color: rgba(148, 163, 184, 0.45) !important;
+}
+
+@layer base {
+  body {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    background-color: var(--app-bg) !important;
+    background-image: var(--app-gradient) !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    color: var(--app-fg) !important;
+  }
+}
+
+.app-custom-bg {
+  background-color: var(--app-bg) !important;
+  background-image: var(--app-gradient) !important;
+  background-attachment: fixed !important;
+}
+
+/* Tùy biến thanh cuộn cho code block */
+pre::-webkit-scrollbar {
+  height: 6px;
+}
+pre::-webkit-scrollbar-thumb {
+  background-color: #94a3b8;
+  border-radius: 3px;
+}

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#16a34a" />
+    <meta name="description" content="Auto Learning: Hệ thống học tập thông minh của Kai - Lập trình, Ngoại ngữ, Sách, Thi cử, Scanner AI & Study Vault" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="apple-touch-icon" href="/logo.svg" />
+    <title>Auto Learning - Kai's Intelligent Workspace</title>
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-brand-500 selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Đăng ký Service Worker cho PWA & Tự động cập nhật khi có phiên bản mới
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then((reg) => {
+            // Chủ động kiểm tra cập nhật mới nhất từ server
+            if (reg.update) {
+              reg.update();
+            }
+
+            reg.onupdatefound = () => {
+              const installingWorker = reg.installing;
+              if (!installingWorker) return;
+              installingWorker.onstatechange = () => {
+                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('Ứng dụng đã phát hiện phiên bản mới, đang đồng bộ...');
+                }
+              };
+            };
+          }).catch((err) => {
+            console.log('SW registration error:', err);
+          });
+        });
+
+        // Tự động chuyển sang bản mới khi Service Worker hoàn tất cập nhật
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
