@@ -264,7 +264,7 @@ export const ReviewPlayer: React.FC<ReviewPlayerProps> = ({ cards, onFinish, onE
   if (!currentCard) return null;
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-6 flex flex-col min-h-[85vh]">
+    <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col min-h-[85vh] safe-area-bottom pb-8">
       {/* Top Header: Navigation & Progress */}
       <div className="flex items-center justify-between gap-3 mb-4">
         <button

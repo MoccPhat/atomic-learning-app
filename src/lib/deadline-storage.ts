@@ -63,7 +63,7 @@ export function calculateTimeRemaining(dueDateStr: string, fromDate: Date = new 
 /**
  * Dữ liệu mẫu ban đầu cho Deadlines
  */
-function getInitialDeadlines(): DeadlineTask[] {
+export function getInitialDeadlines(): DeadlineTask[] {
   const now = new Date();
   const formatOffset = (daysOffset: number) => {
     const d = new Date(now);
@@ -111,15 +111,14 @@ function getInitialDeadlines(): DeadlineTask[] {
 }
 
 /**
- * Đọc danh sách Deadlines từ LocalStorage
+ * Đọc danh sách Deadlines từ LocalStorage (mặc định rỗng để người dùng tự thêm deadline của mình)
  */
 export function getDeadlines(): DeadlineTask[] {
   try {
     const raw = localStorage.getItem(DEADLINES_STORAGE_KEY);
     if (raw === null) {
-      const initial = getInitialDeadlines();
-      saveDeadlines(initial);
-      return initial;
+      saveDeadlines([]);
+      return [];
     }
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];

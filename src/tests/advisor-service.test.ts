@@ -38,10 +38,9 @@ describe('Smart Study Advisor & Kanban Roadmap Engine', () => {
     localStorage.clear();
   });
 
-  it('khởi tạo danh sách nhiệm vụ Kanban mặc định', () => {
+  it('khởi tạo danh sách nhiệm vụ rỗng ban đầu để người dùng tự lập kế hoạch', () => {
     const tasks = getRoadmapTasks();
-    expect(tasks.length).toBeGreaterThanOrEqual(3);
-    expect(tasks.some((t) => t.status === 'today')).toBe(true);
+    expect(tasks).toEqual([]);
   });
 
   it('thêm nhiệm vụ mới vào bảng Kanban', () => {

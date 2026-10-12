@@ -4,7 +4,6 @@ import {
   plantCompletedTree,
   recordWitheredTree,
   getGardenStats,
-  INITIAL_GARDEN_TREES,
 } from '../lib/focus-garden-storage';
 
 // Polyfill localStorage cho Vitest môi trường Node
@@ -30,10 +29,9 @@ describe('Virtual Focus Garden Storage & Stats', () => {
     localStorage.clear();
   });
 
-  it('nạp dữ liệu khởi tạo khi chưa có dữ liệu trong LocalStorage', () => {
+  it('khởi tạo vườn rỗng khi chưa có dữ liệu trong LocalStorage', () => {
     const trees = getGardenTrees();
-    expect(trees.length).toBe(INITIAL_GARDEN_TREES.length);
-    expect(trees[0].species).toBe('oak');
+    expect(trees).toEqual([]);
   });
 
   it('trồng cây mới thành công khi hoàn thành phiên Pomodoro', () => {
@@ -54,17 +52,25 @@ describe('Virtual Focus Garden Storage & Stats', () => {
   });
 
   it('tính toán cấp bậc người làm vườn chuẩn xác theo số lượng cây', () => {
-    // 3 cây mẫu ban đầu: Level 1
+    // Ban đầu vườn trống: 0 cây
     let stats = getGardenStats();
+    expect(stats.totalHarvested).toBe(0);
+
+    // Trồng 3 cây để đạt mốc
+    plantCompletedTree(30, 'Toán');
+    plantCompletedTree(30, 'Văn');
+    plantCompletedTree(30, 'Anh');
+
+    stats = getGardenStats();
     expect(stats.totalHarvested).toBe(3);
     expect(stats.gardenerLevel).toContain('Level 1');
 
     // Thêm cây để thăng hạng
-    plantCompletedTree(30, 'Toán');
-    plantCompletedTree(30, 'Văn');
-    plantCompletedTree(30, 'Anh');
+    plantCompletedTree(30, 'Sử');
+    plantCompletedTree(30, 'Địa');
     plantCompletedTree(30, 'Lý');
     plantCompletedTree(30, 'Hóa');
+    plantCompletedTree(30, 'Sinh');
 
     stats = getGardenStats();
     expect(stats.totalHarvested).toBe(8);

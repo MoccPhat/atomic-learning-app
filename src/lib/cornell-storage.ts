@@ -92,14 +92,14 @@ Việc sử dụng các cụm từ tự nhiên (Collocations) thay vì ghép t�
 ];
 
 /**
- * Lấy toàn bộ danh sách Cornell Notes
+ * Lấy toàn bộ danh sách Cornell Notes (mặc định rỗng để người dùng tự ghi chép bài học)
  */
 export function getCornellNotes(): CornellNote[] {
   try {
     const raw = localStorage.getItem(CORNELL_STORAGE_KEY);
     if (!raw) {
-      saveCornellNotes(INITIAL_CORNELL_NOTES);
-      return INITIAL_CORNELL_NOTES;
+      saveCornellNotes([]);
+      return [];
     }
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];

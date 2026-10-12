@@ -1,15 +1,21 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   loadQuizSets,
+  saveQuizSets,
+  getInitialQuizSet,
   deleteQuizSet,
   addQuizSetFromText,
 } from '../lib/quiz-storage';
 import {
   getMindMaps,
+  saveMindMap,
+  INITIAL_MINDMAPS,
   deleteMindMap,
 } from '../lib/mindmap-storage';
 import {
   getDeadlines,
+  saveDeadlines,
+  getInitialDeadlines,
   deleteDeadline,
 } from '../lib/deadline-storage';
 
@@ -43,13 +49,13 @@ describe('Storage Deletion Persistence (Karpathy Verification)', () => {
   });
 
   describe('Quiz Storage Deletion', () => {
-    it('khởi tạo bộ đề mẫu khi LocalStorage hoàn toàn chưa có dữ liệu (null)', () => {
+    it('khởi tạo danh sách rỗng khi LocalStorage hoàn toàn chưa có dữ liệu (null)', () => {
       const initial = loadQuizSets();
-      expect(initial.length).toBeGreaterThan(0);
-      expect(initial[0].name).toContain('Ôn tập Kiến thức Công nghệ');
+      expect(initial).toEqual([]);
     });
 
     it('xóa bộ đề duy nhất thành công và không bị tự động hồi sinh dữ liệu mẫu', () => {
+      saveQuizSets(getInitialQuizSet());
       const initial = loadQuizSets();
       expect(initial.length).toBe(1);
       const targetId = initial[0].id;
@@ -94,12 +100,13 @@ Giải thích: TCP và UDP thuộc Transport Layer.
   });
 
   describe('MindMap Storage Deletion', () => {
-    it('khởi tạo bản đồ mẫu khi chưa có dữ liệu', () => {
+    it('khởi tạo danh sách mindmaps rỗng khi chưa có dữ liệu', () => {
       const maps = getMindMaps();
-      expect(maps.length).toBeGreaterThan(0);
+      expect(maps).toEqual([]);
     });
 
     it('xóa toàn bộ mindmap không bị hồi sinh INITIAL_MINDMAPS', () => {
+      saveMindMap(INITIAL_MINDMAPS[0]);
       const maps = getMindMaps();
       expect(maps.length).toBeGreaterThan(0);
 
@@ -113,6 +120,7 @@ Giải thích: TCP và UDP thuộc Transport Layer.
 
   describe('Deadline Storage Deletion', () => {
     it('xóa toàn bộ deadlines không bị hồi sinh', () => {
+      saveDeadlines(getInitialDeadlines());
       const initial = getDeadlines();
       expect(initial.length).toBeGreaterThan(0);
 

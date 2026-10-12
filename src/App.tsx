@@ -221,7 +221,7 @@ export default function App() {
           }}
         />
       ) : (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen w-full max-w-full overflow-x-hidden">
           {/* Thanh Menu bên trái có thể Ẩn / Hiện */}
           <Sidebar
             isOpen={isSidebarOpen}
@@ -253,7 +253,7 @@ export default function App() {
 
           {/* Vùng nội dung chính */}
           <main
-            className={`flex-1 transition-all duration-300 ease-in-out pb-24 lg:pb-8 ${
+            className={`flex-1 min-w-0 max-w-full overflow-x-hidden transition-all duration-300 ease-in-out pb-24 lg:pb-8 ${
               isSidebarOpen ? 'lg:pl-72' : 'lg:pl-0'
             }`}
           >
@@ -292,7 +292,7 @@ export default function App() {
                 <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
                   <button
                     onClick={() => setIsSidebarOpen((prev) => !prev)}
-                    className="p-2 -ml-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
                     title="Ẩn / Hiện menu danh mục"
                   >
                     <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
@@ -332,7 +332,7 @@ export default function App() {
                 <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
                   <button
                     onClick={() => setIsSidebarOpen((prev) => !prev)}
-                    className="p-2 -ml-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
                     title="Ẩn / Hiện menu danh mục"
                   >
                     <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
@@ -365,7 +365,7 @@ export default function App() {
                 <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
                   <button
                     onClick={() => setIsSidebarOpen((prev) => !prev)}
-                    className="p-2 -ml-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
                     title="Ẩn / Hiện menu danh mục"
                   >
                     <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
@@ -391,7 +391,7 @@ export default function App() {
                 <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
                   <button
                     onClick={() => setIsSidebarOpen((prev) => !prev)}
-                    className="p-2 -ml-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
                     title="Ẩn / Hiện menu danh mục"
                   >
                     <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />

@@ -46,12 +46,9 @@ describe('MindMap Storage & Layout Engine', () => {
     vi.restoreAllMocks();
   });
 
-  it('khởi tạo danh sách mindmaps mẫu ban đầu khi localStorage trống', () => {
+  it('khởi tạo danh sách mindmaps rỗng ban đầu khi localStorage trống', () => {
     const list = getMindMaps();
-    expect(list.length).toBeGreaterThan(0);
-    expect(list[0].title).toContain('Atomic Learning');
-    expect(list[0].rootNodeId).toBeDefined();
-    expect(list[0].nodes[list[0].rootNodeId].isRoot).toBe(true);
+    expect(list).toEqual([]);
   });
 
   it('tạo mindmap mới và tự động thiết lập nút gốc (Root Node)', () => {

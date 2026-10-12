@@ -16,14 +16,14 @@ const DEFAULT_STATS: UserStats = {
 };
 
 /**
- * Lấy toàn bộ danh sách thẻ từ LocalStorage (tự khởi tạo seed data nếu trống)
+ * Lấy toàn bộ danh sách thẻ từ LocalStorage (mặc định mảng rỗng để người dùng tự thêm dữ liệu)
  */
 export function getCards(): Card[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.CARDS);
     if (raw === null) {
-      saveCards(INITIAL_CARDS);
-      return INITIAL_CARDS;
+      saveCards([]);
+      return [];
     }
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -151,32 +151,24 @@ export function getInitialUserStats(): UserStats {
 }
 
 /**
- * Lấy thông tin thống kê người dùng
+ * Lấy thông tin thống kê người dùng (mặc định sạch để người dùng tự bắt đầu hành trình của mình)
  */
 export function getUserStats(): UserStats {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.STATS);
     if (!raw) {
-      const initial = getInitialUserStats();
-      saveUserStats(initial);
-      return initial;
+      saveUserStats(DEFAULT_STATS);
+      return DEFAULT_STATS;
     }
     const parsed = JSON.parse(raw);
-    // Nếu historyMap rỗng hoặc có quá ít ngày (< 15 ngày)
-    if (!parsed.historyMap || Object.keys(parsed.historyMap).length < 15) {
-      const initial = getInitialUserStats();
-      const updated = {
-        ...initial,
-        ...parsed,
-        streak: parsed.streak > 0 ? parsed.streak : initial.streak,
-        historyMap: { ...initial.historyMap, ...(parsed.historyMap || {}) },
-      };
-      saveUserStats(updated);
-      return updated;
-    }
-    return parsed;
+    return {
+      streak: typeof parsed.streak === 'number' ? parsed.streak : 0,
+      lastActiveDate: parsed.lastActiveDate || '',
+      totalReviews: typeof parsed.totalReviews === 'number' ? parsed.totalReviews : 0,
+      historyMap: parsed.historyMap || {},
+    };
   } catch {
-    return getInitialUserStats();
+    return DEFAULT_STATS;
   }
 }
 

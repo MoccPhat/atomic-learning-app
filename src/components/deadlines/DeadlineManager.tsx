@@ -156,7 +156,7 @@ export const DeadlineManager: React.FC<DeadlineManagerProps> = ({
   };
 
   return (
-    <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm text-left relative">
+    <div className="w-full max-w-full overflow-hidden p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm text-left relative">
       {/* Toast Notification khi xóa thành công */}
       {toastMessage && (
         <div className="fixed top-5 right-5 z-50 p-3.5 px-4 rounded-2xl bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold shadow-2xl border border-slate-700 flex items-center gap-2.5 animate-bounce">

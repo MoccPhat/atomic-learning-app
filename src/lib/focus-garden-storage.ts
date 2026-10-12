@@ -33,15 +33,14 @@ export const INITIAL_GARDEN_TREES: GardenTree[] = [
 ];
 
 /**
- * Lấy toàn bộ cây trong khu vườn từ LocalStorage
+ * Lấy toàn bộ cây trong khu vườn từ LocalStorage (mặc định rỗng để người dùng tự trồng cây từ đầu)
  */
 export function getGardenTrees(): GardenTree[] {
   try {
     const raw = localStorage.getItem(GARDEN_STORAGE_KEY);
     if (!raw) {
-      const cloned = JSON.parse(JSON.stringify(INITIAL_GARDEN_TREES));
-      saveGardenTrees(cloned);
-      return cloned;
+      saveGardenTrees([]);
+      return [];
     }
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];

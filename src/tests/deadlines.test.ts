@@ -86,12 +86,10 @@ describe('Deadlines & Exam Countdown Engine', () => {
   });
 
   describe('Deadline Storage CRUD', () => {
-    it('getDeadlines trả về seed data ban đầu nếu storage trống', () => {
+    it('getDeadlines trả về mảng rỗng nếu storage trống để người dùng tự nhập deadline', () => {
       const deadlines = getDeadlines();
       expect(Array.isArray(deadlines)).toBe(true);
-      expect(deadlines.length).toBeGreaterThan(0);
-      expect(deadlines[0]).toHaveProperty('id');
-      expect(deadlines[0]).toHaveProperty('title');
+      expect(deadlines.length).toBe(0);
     });
 
     it('addDeadline tạo mới một nhiệm vụ thành công và chèn vào đầu danh sách', () => {

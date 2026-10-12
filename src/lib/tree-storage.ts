@@ -63,9 +63,10 @@ export async function loadTreeData(): Promise<TreeData> {
     }
   }
 
-  // Nếu chưa có dữ liệu, lưu dữ liệu mẫu ban đầu
-  await saveTreeData(INITIAL_TREE_DATA);
-  return INITIAL_TREE_DATA;
+  // Nếu chưa có dữ liệu, khởi tạo cây rỗng để người dùng tự thêm dữ liệu của mình
+  const emptyTree: TreeData = { groups: [] };
+  await saveTreeData(emptyTree);
+  return emptyTree;
 }
 
 /**

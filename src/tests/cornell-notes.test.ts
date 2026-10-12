@@ -38,11 +38,9 @@ describe('Cornell Notes Studio - Storage & SRS Integration', () => {
     localStorage.clear();
   });
 
-  it('khởi tạo dữ liệu mẫu ban đầu khi LocalStorage trống', () => {
+  it('khởi tạo danh sách rỗng ban đầu khi LocalStorage trống', () => {
     const notes = getCornellNotes();
-    expect(notes.length).toBeGreaterThanOrEqual(2);
-    expect(notes[0].title).toContain('Tìm kiếm Nhị phân');
-    expect(notes[0].cues.length).toBeGreaterThan(0);
+    expect(notes).toEqual([]);
   });
 
   it('tạo ghi chú mới với các trường hợp mặc định', () => {

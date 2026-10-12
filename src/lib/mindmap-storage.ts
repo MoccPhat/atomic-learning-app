@@ -5,7 +5,7 @@ import { CornellNote } from './cornell-types';
 const STORAGE_KEY = 'atomic_mindmaps_data';
 
 // Dữ liệu mẫu khởi tạo khi người dùng lần đầu mở tính năng
-const INITIAL_MINDMAPS: MindMap[] = [
+export const INITIAL_MINDMAPS: MindMap[] = [
   {
     id: 'mindmap-sample-1',
     title: 'Hệ Thống Học Tập Nguyên Tử (Atomic Learning System)',
@@ -153,14 +153,14 @@ const INITIAL_MINDMAPS: MindMap[] = [
 ];
 
 /**
- * Lấy danh sách toàn bộ các bản đồ tư duy
+ * Lấy danh sách toàn bộ các bản đồ tư duy (mặc định rỗng để người dùng tự vẽ sơ đồ của mình)
  */
 export function getMindMaps(): MindMap[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw === null) {
-      saveAllMindMaps(INITIAL_MINDMAPS);
-      return INITIAL_MINDMAPS;
+      saveAllMindMaps([]);
+      return [];
     }
     const list = JSON.parse(raw);
     return Array.isArray(list) ? list : [];

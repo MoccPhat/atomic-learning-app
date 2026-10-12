@@ -1,18 +1,17 @@
 import { CheatSheetItem, CheatSheetCategory } from './cheatsheet-types';
-import { INITIAL_CHEATSHEETS } from './cheatsheet-seed-data';
+export { INITIAL_CHEATSHEETS } from './cheatsheet-seed-data';
 
 const STORAGE_KEY = 'atomic_cheatsheet_vault';
 
 /**
- * Nạp danh sách Cheat Sheets (kèm clone để tránh mutation bug)
+ * Nạp danh sách Cheat Sheets (mặc định rỗng để người dùng tự thêm cẩm nang tra cứu)
  */
 export function getCheatSheets(): CheatSheetItem[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      const cloned = JSON.parse(JSON.stringify(INITIAL_CHEATSHEETS));
-      saveCheatSheets(cloned);
-      return cloned;
+      saveCheatSheets([]);
+      return [];
     }
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];

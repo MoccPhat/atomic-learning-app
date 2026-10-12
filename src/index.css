@@ -67,6 +67,14 @@ html.contrast-strong section {
 }
 
 @layer base {
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
   body {
     -webkit-tap-highlight-color: transparent;
     user-select: none;

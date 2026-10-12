@@ -23,8 +23,13 @@ export const StudyHeatmap: React.FC<StudyHeatmapProps> = ({
     isFuture: boolean;
   } | null>(null);
 
-  // Bộ lọc thời gian: 1 tháng, 6 tháng hoặc 12 tháng (mặc định 12 tháng)
-  const [rangeMonths, setRangeMonths] = useState<HeatmapRangeMonths>(12);
+  // Bộ lọc thời gian: 1 tháng, 6 tháng hoặc 12 tháng (mặc định 1 tháng trên mobile, 12 tháng trên desktop)
+  const [rangeMonths, setRangeMonths] = useState<HeatmapRangeMonths>(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      return 1;
+    }
+    return 12;
+  });
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
@@ -263,7 +268,7 @@ export const StudyHeatmap: React.FC<StudyHeatmapProps> = ({
   };
 
   return (
-    <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm text-left select-none relative overflow-hidden animate-fade-in">
+    <div className="w-full max-w-full p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm text-left select-none relative overflow-hidden animate-fade-in">
       {/* Background Subtle Emerald & Cyan Ambient Glow */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -401,7 +406,7 @@ export const StudyHeatmap: React.FC<StudyHeatmapProps> = ({
       {/* Heatmap Grid Matrix Container */}
       <div
         ref={scrollRef}
-        className={`overflow-x-auto pb-3 pt-1 ${
+        className={`w-full max-w-full overflow-x-auto pb-3 pt-1 ${
           layoutConfig.isCentered ? 'flex justify-center' : ''
         }`}
       >

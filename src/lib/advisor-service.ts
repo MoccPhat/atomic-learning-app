@@ -56,14 +56,14 @@ export const INITIAL_ROADMAP_TASKS: RoadmapTask[] = [
 ];
 
 /**
- * Đọc danh sách nhiệm vụ lộ trình (Roadmap Kanban)
+ * Đọc danh sách nhiệm vụ lộ trình (Roadmap Kanban - mặc định rỗng để người dùng tự lập kế hoạch của mình)
  */
 export function getRoadmapTasks(): RoadmapTask[] {
   try {
     const raw = localStorage.getItem(ROADMAP_STORAGE_KEY);
     if (!raw) {
-      saveRoadmapTasks(INITIAL_ROADMAP_TASKS);
-      return INITIAL_ROADMAP_TASKS;
+      saveRoadmapTasks([]);
+      return [];
     }
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];

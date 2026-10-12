@@ -143,7 +143,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* Nút Ẩn / Hiện Menu bên trái */}
           <button
             onClick={onToggleSidebar}
-            className="p-2 -ml-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+            className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
             title="Ẩn / Hiện menu danh mục"
           >
             <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
@@ -507,16 +507,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
         )}
       </section>
 
-      {/* Floating Action Button on Mobile */}
-      <div className="sm:hidden fixed bottom-5 right-5 z-40">
-        <button
-          onClick={onOpenQuickCapture}
-          className="w-14 h-14 rounded-full bg-brand-600 text-white shadow-xl shadow-brand-500/40 flex items-center justify-center active:scale-95 transition-transform"
-          title="Thêm thẻ mới"
-        >
-          <Plus className="w-7 h-7" />
-        </button>
-      </div>
 
       {/* Modal Preview Single Card */}
       {previewCard && (

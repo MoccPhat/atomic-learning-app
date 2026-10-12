@@ -9,7 +9,7 @@ const STORAGE_KEYS = {
 /**
  * Khởi tạo dữ liệu mẫu cho bộ đề trắc nghiệm
  */
-function getInitialQuizSet(): QuizSet[] {
+export function getInitialQuizSet(): QuizSet[] {
   const { questions } = parseMarkdownQuiz(SAMPLE_QUIZ_MD);
   return [
     {
@@ -22,15 +22,14 @@ function getInitialQuizSet(): QuizSet[] {
 }
 
 /**
- * Tải danh sách bộ đề
+ * Tải danh sách bộ đề (mặc định rỗng để người dùng tự thêm dữ liệu của mình)
  */
 export function loadQuizSets(): QuizSet[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.QUIZZES);
     if (raw === null) {
-      const initial = getInitialQuizSet();
-      saveQuizSets(initial);
-      return initial;
+      saveQuizSets([]);
+      return [];
     }
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
