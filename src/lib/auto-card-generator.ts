@@ -68,29 +68,53 @@ export function extractCardsHeuristically(text: string): ExtractionResult {
     }
   }
 
-  // Nếu không tìm thấy đủ theo regex, phân tích theo từng đoạn văn bản ngắn
+  // Nếu không tìm thấy đủ theo regex, phân tích theo từng đoạn hoặc dòng văn bản
   if (flashcards.length < 3) {
-    const paragraphs = clean.split(/\n\s*\n/).filter((p) => p.trim().length > 30);
-    paragraphs.slice(0, 5).forEach((p, idx) => {
-      const firstSentence = p.split(/[.?!]/)[0].trim();
-      const rest = p.slice(firstSentence.length).trim().replace(/^[.?!]\s*/, '');
+    const chunks = clean.includes('\n\n')
+      ? clean.split(/\n\s*\n/).map((p) => p.trim()).filter((p) => p.length > 20)
+      : clean.split('\n').map((p) => p.trim()).filter((p) => p.length > 15);
 
-      if (firstSentence.length > 5 && rest.length > 15) {
+    chunks.slice(0, 5).forEach((p) => {
+      const parts = p.split(/[.?!]/).map((s) => s.trim()).filter(Boolean);
+      const firstSentence = parts[0] || p;
+      const rest = parts.slice(1).join('. ') || p;
+
+      if (firstSentence && !flashcards.some((f) => f.back === p)) {
         flashcards.push({
-          title: `Ý chính #${idx + 1}`,
-          front: firstSentence + '?',
-          back: rest || p,
+          title: `Ý chính #${flashcards.length + 1}`,
+          front: firstSentence.endsWith('?') ? firstSentence : `${firstSentence}?`,
+          back: rest.length > 5 ? rest : p,
           selected: true,
         });
       }
     });
   }
 
+  // Fallback an toàn tuyệt đối: Nếu văn bản có nội dung nhưng chưa tạo được thẻ nào
+  if (flashcards.length === 0 && clean.length > 0) {
+    const sentences = clean.split(/[.?!;\n]+/).map((s) => s.trim()).filter((s) => s.length >= 8);
+    if (sentences.length >= 2) {
+      flashcards.push({
+        title: 'Nội dung cốt lõi',
+        front: `${sentences[0]}?`,
+        back: sentences.slice(1).join('. '),
+        selected: true,
+      });
+    } else {
+      flashcards.push({
+        title: 'Kiến thức cần nhớ',
+        front: clean.length > 60 ? `${clean.slice(0, 60)}... có ý nghĩa gì?` : `Nội dung cốt lõi: ${clean}?`,
+        back: clean,
+        selected: true,
+      });
+    }
+  }
+
   // Sinh câu hỏi trắc nghiệm từ các định nghĩa đã tìm được
   const quizzes: GeneratedQuiz[] = [];
   const termPool = definitions.map((d) => d.term);
 
-  definitions.slice(0, 4).forEach((d, _idx) => {
+  definitions.slice(0, 4).forEach((d) => {
     // Các phương án sai lấy từ các thuật ngữ khác
     const otherTerms = termPool.filter((t) => t !== d.term);
     const wrongDistractors = otherTerms.slice(0, 3);
@@ -118,6 +142,23 @@ export function extractCardsHeuristically(text: string): ExtractionResult {
       selected: true,
     });
   });
+
+  // Fallback sinh quiz nếu flashcards có thẻ nhưng definitions chưa sinh được quiz
+  if (quizzes.length === 0 && flashcards.length > 0) {
+    const firstCard = flashcards[0];
+    quizzes.push({
+      question: `Nội dung nào sau đây mô tả đúng nhất về "${firstCard.title}"?`,
+      options: [
+        { key: 'A', text: firstCard.back.slice(0, 100) },
+        { key: 'B', text: 'Khái niệm đối lập hoặc không liên quan đến chủ đề này.' },
+        { key: 'C', text: 'Chỉ áp dụng trong một số trường hợp ngoại lệ đặc biệt.' },
+        { key: 'D', text: 'Cả ba đáp án trên đều chưa chính xác.' },
+      ],
+      answer: 'A',
+      explanation: `Chính xác! "${firstCard.title}" được mô tả là: ${firstCard.back.slice(0, 120)}`,
+      selected: true,
+    });
+  }
 
   return {
     flashcards: flashcards.slice(0, 8),

@@ -84,6 +84,10 @@ export const InstantCardGeneratorModal: React.FC<InstantCardGeneratorModalProps>
 
   const handleSave = () => {
     if (!result) return;
+    if (selectedCardsCount === 0 && selectedQuizzesCount === 0) {
+      alert('Vui lòng chọn ít nhất 1 thẻ Flashcard hoặc 1 câu Quiz để lưu vào hệ thống!');
+      return;
+    }
     const res = saveExtractedCardsAndQuizzes(
       result,
       targetCategory,
@@ -98,7 +102,7 @@ export const InstantCardGeneratorModal: React.FC<InstantCardGeneratorModalProps>
     setTimeout(() => {
       setSaveSuccessMsg(null);
       onClose();
-    }, 2000);
+    }, 1500);
   };
 
   const selectedCardsCount = result?.flashcards.filter((f) => f.selected).length || 0;
@@ -233,14 +237,37 @@ export const InstantCardGeneratorModal: React.FC<InstantCardGeneratorModalProps>
                 </button>
               </div>
 
-              {/* Phần 1: Flashcards trích xuất */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-brand-500" />
-                    <span>Thẻ Flashcards Gợi Ý ({selectedCardsCount}/{result.flashcards.length})</span>
+              {/* Nếu không có thẻ nào và cũng không có câu hỏi nào */}
+              {result.flashcards.length === 0 && result.quizzes.length === 0 && (
+                <div className="py-10 text-center rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-6 animate-fade-in">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-500 flex items-center justify-center shadow-xs">
+                    <Sparkles className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                    Chưa bóc tách được khái niệm hoặc câu hỏi phù hợp
                   </h4>
+                  <p className="text-xs text-slate-400 max-w-md mx-auto mt-1 mb-4">
+                    Đoạn văn bản có thể quá ngắn hoặc chưa chứa định nghĩa rõ ràng. Bạn hãy bấm nút bên dưới để dán đoạn văn bản dài hơn hoặc chi tiết hơn.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setResult(null)}
+                    className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs transition-all active:scale-95 shadow-md shadow-brand-500/20"
+                  >
+                    Nhập văn bản khác
+                  </button>
                 </div>
+              )}
+
+              {/* Phần 1: Flashcards trích xuất */}
+              {result.flashcards.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                      <Layers className="w-4 h-4 text-brand-500" />
+                      <span>Thẻ Flashcards Gợi Ý ({selectedCardsCount}/{result.flashcards.length})</span>
+                    </h4>
+                  </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {result.flashcards.map((f, idx) => (
@@ -275,6 +302,7 @@ export const InstantCardGeneratorModal: React.FC<InstantCardGeneratorModalProps>
                   ))}
                 </div>
               </div>
+            )}
 
               {/* Phần 2: Câu hỏi Quiz trích xuất */}
               {result.quizzes.length > 0 && (
@@ -360,7 +388,16 @@ export const InstantCardGeneratorModal: React.FC<InstantCardGeneratorModalProps>
                 type="button"
                 onClick={handleSave}
                 disabled={selectedCardsCount === 0 && selectedQuizzesCount === 0}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white shadow-lg shadow-brand-500/20 active:scale-95 transition-all"
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black transition-all ${
+                  selectedCardsCount === 0 && selectedQuizzesCount === 0
+                    ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-60 shadow-none'
+                    : 'bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-700 hover:to-indigo-700 text-white shadow-lg shadow-brand-500/20 active:scale-95 cursor-pointer'
+                }`}
+                title={
+                  selectedCardsCount === 0 && selectedQuizzesCount === 0
+                    ? 'Vui lòng chọn ít nhất 1 thẻ Flashcard hoặc câu Quiz để lưu'
+                    : 'Lưu các thẻ Flashcard và câu Quiz đã chọn vào hệ thống học tập'
+                }
               >
                 <Save className="w-4 h-4" />
                 <span>Lưu Vào Hệ Thống Ngay</span>
