@@ -75,6 +75,15 @@ html.contrast-strong section {
     overflow-x: hidden;
   }
 
+  html,
+  body,
+  button,
+  input,
+  select,
+  textarea {
+    font-family: "Times New Roman", Times, serif;
+  }
+
   body {
     -webkit-tap-highlight-color: transparent;
     user-select: none;
