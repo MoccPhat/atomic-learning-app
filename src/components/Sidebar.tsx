@@ -4,7 +4,7 @@ import {
   BookOpen,
   BarChart3,
   Calendar,
-  Sparkles,
+  AlertTriangle,
   MoreHorizontal,
   X,
   FileText,
@@ -119,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
-          {/* 4 Main Navigation Menu Items */}
+          {/* Main Navigation Menu Items */}
           <nav className="space-y-1">
             {/* 1. Tổng quan (Dashboard) */}
             <button
@@ -137,7 +137,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span>Tổng quan</span>
             </button>
 
-            {/* 2. Thư viện (Vault / Tree) */}
+            {/* 2. Trợ lý lộ trình (Advisor & Roadmap) */}
+            <button
+              onClick={() => {
+                onSelectTab('advisor');
+                if (window.innerWidth < 1024) onClose();
+              }}
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                activeTab === 'advisor'
+                  ? 'bg-[#E6F4EA] dark:bg-[#0D6E4F]/20 text-[#0D6E4F] dark:text-[#34D399]'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100'
+              }`}
+            >
+              <Compass className="w-4 h-4" />
+              <span>Trợ lý lộ trình</span>
+            </button>
+
+            {/* 3. Thư viện (Vault / Tree) */}
             <button
               onClick={() => {
                 onSelectTab('tree');
@@ -332,34 +348,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        {/* Bottom Section: Floating AI Advisor Card + User Profile */}
-        <div className="p-4 space-y-3 relative">
-          {/* Card: Trợ lý học tập AI */}
-          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-slate-50 to-indigo-50/40 dark:from-slate-800/60 dark:to-indigo-950/20 border border-slate-200/70 dark:border-slate-700/60">
-            <div className="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-2">
-              <Sparkles className="w-3.5 h-3.5" />
-            </div>
-            <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-0.5">
-              Trợ lý học tập AI
-            </h4>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
-              Hỏi đáp và lên lộ trình học phù hợp với bạn.
-            </p>
-            <button
-              onClick={() => {
-                onSelectTab('advisor');
-                if (window.innerWidth < 1024) onClose();
-              }}
-              className="mt-2.5 text-xs font-bold text-[#0D6E4F] hover:text-[#0A573E] dark:text-[#34D399] flex items-center gap-1 transition-colors cursor-pointer"
-            >
-              <span>Trò chuyện ngay</span>
-              <span>→</span>
-            </button>
-          </div>
-
-          {/* User Profile Popover Menu */}
+        {/* Bottom Section: Hệ thống & Tiện ích */}
+        <div className="p-3 border-t border-slate-100 dark:border-slate-800 relative">
+          {/* Backdrop for Popover */}
           {isProfileMenuOpen && (
-            <div className="absolute bottom-16 right-4 left-4 z-50 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl p-1.5 space-y-0.5 text-xs animate-in fade-in slide-in-from-bottom-2 duration-150">
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setIsProfileMenuOpen(false)}
+            />
+          )}
+
+          {/* User Options Popover Menu */}
+          {isProfileMenuOpen && (
+            <div className="absolute bottom-14 right-3 left-3 z-50 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl p-1.5 space-y-0.5 text-xs animate-in fade-in slide-in-from-bottom-2 duration-150">
               {onOpenAchievements && (
                 <button
                   onClick={() => {
@@ -381,7 +382,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/70 transition-colors cursor-pointer"
                 >
-                  <Compass className="w-4 h-4 text-purple-500" />
+                  <AlertTriangle className="w-4 h-4 text-rose-500" />
                   <span>Sổ tay câu sai</span>
                 </button>
               )}
@@ -438,30 +439,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* User Profile Row at Bottom */}
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center justify-center shrink-0">
-                MN
-              </div>
-              <div className="truncate leading-tight">
-                <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block truncate">
-                  Minh Nguyên
-                </span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 block">
-                  Học viên
-                </span>
-              </div>
-            </div>
+          {/* Quick System Actions Row */}
+          <div className="flex items-center justify-between gap-1.5">
+            <button
+              onClick={onOpenSettings}
+              className="flex-1 flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
+              title="Mở Cài đặt hệ thống & Giao diện"
+            >
+              <Settings className="w-4 h-4 text-slate-500 shrink-0" />
+              <span className="truncate">Cài đặt hệ thống</span>
+            </button>
 
             <button
               onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+              className={`p-2 rounded-xl transition-colors cursor-pointer shrink-0 ${
                 isProfileMenuOpen
                   ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
-              title="Tùy chọn & Tiện ích"
+              title="Tiện ích mở rộng & Tùy chọn"
             >
               <MoreHorizontal className="w-4 h-4" />
             </button>
