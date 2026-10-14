@@ -60,18 +60,18 @@ export const GRADIENT_DESCENT_PRESETS = [
 export const DEFAULT_THEME_SETTINGS: ThemeSettings = {
   mode: 'system',
   contrast: 'default',
-  accent: 'emerald',
+  accent: 'rose',
   lightScheme: {
-    preset: 'default-light',
-    bg: '#F8FAFC',
-    fg: '#0F172A',
-    accent: '#16A34A',
+    preset: 'warm-paper',
+    bg: '#F4EFE6',
+    fg: '#1F1B16',
+    accent: '#C4452D',
   },
   darkScheme: {
-    preset: 'default-dark',
-    bg: '#090D16',
-    fg: '#FFFFFF',
-    accent: '#22C55E',
+    preset: 'deep-charcoal',
+    bg: '#1C1A17',
+    fg: '#E9E2D3',
+    accent: '#C4452D',
   },
   gradient: {
     enabled: false,

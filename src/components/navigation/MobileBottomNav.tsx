@@ -9,8 +9,8 @@ import {
 } from 'lucide-react';
 
 interface MobileBottomNavProps {
-  activeTab: 'cards' | 'quiz' | 'tree' | 'pomodoro' | 'scanner' | 'cornell' | 'advisor' | 'feynman' | 'cheatsheet' | 'mindmap';
-  onSelectTab: (tab: 'cards' | 'quiz' | 'tree' | 'pomodoro' | 'scanner' | 'cornell' | 'advisor' | 'feynman' | 'cheatsheet' | 'mindmap') => void;
+  activeTab: string;
+  onSelectTab: (tab: any) => void;
   onOpenMenu: () => void;
   dueCount: number;
   quizCount: number;
@@ -34,11 +34,11 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       {activeTab === 'cards' && (
         <button
           onClick={onOpenQuickCapture}
-          className="lg:hidden fixed right-4 bottom-20 z-40 w-13 h-13 rounded-2xl bg-gradient-to-tr from-brand-600 to-emerald-500 text-white shadow-xl shadow-brand-500/35 flex items-center justify-center active:scale-90 transition-all border-2 border-white dark:border-slate-800"
+          className="lg:hidden fixed right-4 bottom-20 z-40 w-12 h-12 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 shadow-lg flex items-center justify-center active:scale-95 transition-all border border-slate-700/50 dark:border-slate-300"
           title="Tạo nhanh thẻ học mới (Quick Capture)"
           aria-label="Tạo nhanh thẻ học mới"
         >
-          <Plus className="w-6 h-6 stroke-[2.5]" />
+          <Plus className="w-5 h-5 stroke-[2.5]" />
         </button>
       )}
 

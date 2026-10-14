@@ -9,7 +9,7 @@ interface KaiLogoProps {
 export const KaiLogo: React.FC<KaiLogoProps> = ({
   size = 36,
   className = '',
-  showGlow = true,
+  showGlow = false,
 }) => {
   return (
     <div
@@ -18,7 +18,7 @@ export const KaiLogo: React.FC<KaiLogoProps> = ({
     >
       {showGlow && (
         <div
-          className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-brand-600 via-emerald-400 to-cyan-400 opacity-40 blur-md pointer-events-none -z-10"
+          className="absolute inset-0 rounded-xl bg-slate-200 dark:bg-slate-800 opacity-30 pointer-events-none -z-10"
         />
       )}
       <svg

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Flame, Calendar, Award, Zap, Sparkles, Plus, CheckCircle2 } from 'lucide-react';
+import { Flame, Award, Zap, Sparkles, Plus, CheckCircle2 } from 'lucide-react';
 import { recordGeneralActivity } from '../../lib/storage';
 
 interface StudyHeatmapProps {
@@ -205,26 +205,26 @@ export const StudyHeatmap: React.FC<StudyHeatmapProps> = ({
     };
   }, [historyMap, rangeWeeks, rangeMonths, layoutConfig, todayStr]);
 
-  // Cấp độ màu phong cách Emerald / Cyan Neon Pro
+  // Cấp độ màu chuẩn hóa theo Semantic Heatmap Tokens
   const getCellColor = (count: number, isFuture: boolean, isToday: boolean) => {
     if (isFuture) {
-      return 'bg-slate-800/10 dark:bg-slate-800/20 border-dashed border-slate-700/30 opacity-25 cursor-not-allowed text-slate-600';
+      return 'bg-theme-subtle/30 border-dashed border-theme-border/40 opacity-25 cursor-not-allowed text-theme-muted';
     }
     if (count === 0) {
       return isToday
-        ? 'bg-slate-800/90 dark:bg-slate-800/90 border-emerald-400 ring-2 ring-emerald-400/80 text-emerald-300'
-        : 'bg-slate-100 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700/50 hover:border-slate-400 dark:hover:border-slate-500 text-slate-400 dark:text-slate-500';
+        ? 'bg-heatmap-0 border-2 border-theme-accent text-theme-accent'
+        : 'bg-heatmap-0 border border-theme-border/60 hover:border-theme-border-strong text-theme-muted';
     }
     if (count <= 2) {
-      return 'bg-[#0e4429] border border-[#1b6a38] text-emerald-200 hover:scale-115 shadow-xs shadow-emerald-950/30';
+      return 'bg-heatmap-1 border border-heatmap-2 text-theme-text hover:scale-115';
     }
     if (count <= 5) {
-      return 'bg-[#006d32] border border-[#26a641] text-emerald-100 hover:scale-115 shadow-xs shadow-emerald-900/30';
+      return 'bg-heatmap-2 border border-heatmap-3 text-white hover:scale-115';
     }
     if (count <= 8) {
-      return 'bg-[#26a641] border border-[#39d353] text-white hover:scale-115 shadow-sm shadow-emerald-500/40';
+      return 'bg-heatmap-3 border border-heatmap-4 text-white hover:scale-115';
     }
-    return 'bg-[#39d353] border border-[#7ee787] text-slate-950 font-black hover:scale-115 shadow-md shadow-emerald-400/60 ring-1 ring-emerald-300';
+    return 'bg-heatmap-4 border border-theme-border-strong text-white font-bold hover:scale-115 ring-1 ring-theme-accent';
   };
 
   const dayLabels = [
@@ -268,42 +268,36 @@ export const StudyHeatmap: React.FC<StudyHeatmapProps> = ({
   };
 
   return (
-    <div className="w-full max-w-full p-4 sm:p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm text-left select-none relative overflow-hidden animate-fade-in">
-      {/* Background Subtle Emerald & Cyan Ambient Glow */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-cyan-500/5 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-
+    <div className="w-full max-w-full p-4 sm:p-5 rounded-xs bg-theme-surface border border-theme-border shadow-[2px_2px_0px_var(--theme-border-strong)] text-left select-none relative overflow-hidden animate-fade-in font-sans">
+      
       {/* Top Header & Range Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800 mb-5 relative z-10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-theme-border mb-4 relative z-10">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 shadow-xs">
-              <Calendar className="w-4 h-4" />
-            </span>
-            <h3 className="font-black text-slate-800 dark:text-slate-100 text-sm sm:text-base tracking-tight">
-              Bản đồ nhiệt chăm chỉ (Study Heatmap)
+            <h3 className="font-serif font-bold text-theme-text text-sm sm:text-base tracking-tight">
+              Bản đồ chăm chỉ (Study Heatmap)
             </h3>
           </div>
-          <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+          <p className="text-[11px] text-theme-muted mt-0.5">
             {rangeMonths === 1
-              ? 'Tổng kết 30 ngày (1 tháng) nỗ lực học tập của bạn'
+              ? 'Tổng kết 30 ngày (1 tháng) nỗ lực học tập'
               : rangeMonths === 6
-              ? 'Tổng kết 180 ngày (6 tháng) nỗ lực học tập của bạn'
-              : 'Tổng kết 365 ngày (12 tháng / 1 năm) nỗ lực học tập của bạn'}
+              ? 'Tổng kết 180 ngày (6 tháng) nỗ lực học tập'
+              : 'Tổng kết 365 ngày (12 tháng / 1 năm) nỗ lực học tập'}
           </p>
         </div>
 
         {/* Range Buttons & Quick Add */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Segmented Control: 1 tháng | 6 tháng | 12 tháng */}
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800/90 rounded-2xl text-xs font-bold border border-slate-200/60 dark:border-slate-700/60 shadow-inner">
+          <div className="flex items-center p-0.5 bg-theme-subtle rounded-xs text-xs font-mono border border-theme-border">
             <button
               type="button"
               onClick={() => setRangeMonths(1)}
-              className={`px-3 py-1.5 rounded-xl transition-all ${
+              className={`px-2.5 py-1 rounded-xs transition-all ${
                 rangeMonths === 1
-                  ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30 font-black'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-theme-surface text-theme-text font-bold shadow-xs'
+                  : 'text-theme-muted hover:text-theme-text'
               }`}
             >
               1 tháng
@@ -311,10 +305,10 @@ export const StudyHeatmap: React.FC<StudyHeatmapProps> = ({
             <button
               type="button"
               onClick={() => setRangeMonths(6)}
-              className={`px-3 py-1.5 rounded-xl transition-all ${
+              className={`px-2.5 py-1 rounded-xs transition-all ${
                 rangeMonths === 6
-                  ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30 font-black'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-theme-surface text-theme-text font-bold shadow-xs'
+                  : 'text-theme-muted hover:text-theme-text'
               }`}
             >
               6 tháng
@@ -322,10 +316,10 @@ export const StudyHeatmap: React.FC<StudyHeatmapProps> = ({
             <button
               type="button"
               onClick={() => setRangeMonths(12)}
-              className={`px-3 py-1.5 rounded-xl transition-all ${
+              className={`px-2.5 py-1 rounded-xs transition-all ${
                 rangeMonths === 12
-                  ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/30 font-black'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-theme-surface text-theme-text font-bold shadow-xs'
+                  : 'text-theme-muted hover:text-theme-text'
               }`}
             >
               12 tháng
@@ -335,7 +329,7 @@ export const StudyHeatmap: React.FC<StudyHeatmapProps> = ({
           <button
             type="button"
             onClick={handleQuickAddToday}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-95 text-white font-bold text-xs shadow-md shadow-emerald-500/20 transition-all"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-xs bg-theme-accent hover:bg-theme-accent-hover text-white font-semibold text-xs border border-theme-border-strong shadow-[1px_1px_0px_var(--theme-border-strong)] transition-all cursor-pointer"
             title="Ghi nhận ngay 1 lượt học tập hôm nay"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -344,60 +338,60 @@ export const StudyHeatmap: React.FC<StudyHeatmapProps> = ({
         </div>
       </div>
 
-      {/* 4 Chỉ số KPI Thống kê sống động - Glassmorphism sang trọng */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 relative z-10">
-        <div className="p-3.5 rounded-2xl bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent border border-orange-500/20 dark:border-orange-500/25 flex items-center gap-3 shadow-xs">
-          <div className="p-2.5 rounded-xl bg-orange-500/15 text-orange-600 dark:text-orange-400 shrink-0">
-            <Flame className="w-4 h-4 fill-current" />
+      {/* 4 Chỉ số KPI Thống kê tối giản */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4 relative z-10">
+        <div className="p-2.5 rounded-xs bg-theme-subtle/50 border border-theme-border flex items-center gap-2.5">
+          <div className="p-2 rounded-xs bg-theme-surface text-theme-accent shrink-0 border border-theme-border">
+            <Flame className="w-3.5 h-3.5 fill-current" />
           </div>
           <div className="truncate">
-            <span className="text-[10px] text-orange-600/80 dark:text-orange-400/80 font-bold uppercase tracking-wider block">
+            <span className="text-[10px] text-theme-muted font-mono uppercase tracking-wider block">
               Streak liên tục
             </span>
-            <span className="text-sm sm:text-base font-black text-orange-700 dark:text-orange-300 truncate block">
-              {streak} ngày 🔥
+            <span className="text-sm font-serif font-bold text-theme-text truncate block">
+              {streak} ngày
             </span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border border-emerald-500/20 dark:border-emerald-500/25 flex items-center gap-3 shadow-xs">
-          <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shrink-0">
-            <Zap className="w-4 h-4 fill-current" />
+        <div className="p-2.5 rounded-xs bg-theme-subtle/50 border border-theme-border flex items-center gap-2.5">
+          <div className="p-2 rounded-xs bg-theme-surface text-theme-success shrink-0 border border-theme-border">
+            <Zap className="w-3.5 h-3.5 fill-current" />
           </div>
           <div className="truncate">
-            <span className="text-[10px] text-emerald-600/80 dark:text-emerald-400/80 font-bold uppercase tracking-wider block">
-              Tổng lượt học ({rangeMonths === 1 ? '1 thg' : rangeMonths === 6 ? '6 thg' : '12 thg'})
+            <span className="text-[10px] text-theme-muted font-mono uppercase tracking-wider block">
+              Tổng lượt học
             </span>
-            <span className="text-sm sm:text-base font-black text-emerald-700 dark:text-emerald-300 truncate block">
-              {stats.totalActivities} lượt ⚡
+            <span className="text-sm font-serif font-bold text-theme-text truncate block">
+              {stats.totalActivities} lượt
             </span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-gradient-to-br from-purple-500/10 via-indigo-500/5 to-transparent border border-purple-500/20 dark:border-purple-500/25 flex items-center gap-3 shadow-xs">
-          <div className="p-2.5 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-400 shrink-0">
-            <Award className="w-4 h-4" />
+        <div className="p-2.5 rounded-xs bg-theme-subtle/50 border border-theme-border flex items-center gap-2.5">
+          <div className="p-2 rounded-xs bg-theme-surface text-theme-muted shrink-0 border border-theme-border">
+            <Award className="w-3.5 h-3.5" />
           </div>
           <div className="truncate">
-            <span className="text-[10px] text-purple-600/80 dark:text-purple-400/80 font-bold uppercase tracking-wider block">
-              Ngày học tích cực
+            <span className="text-[10px] text-theme-muted font-mono uppercase tracking-wider block">
+              Ngày tích cực
             </span>
-            <span className="text-sm sm:text-base font-black text-purple-700 dark:text-purple-300 truncate block">
-              {stats.totalActiveDays} ngày 🎖️
+            <span className="text-sm font-serif font-bold text-theme-text truncate block">
+              {stats.totalActiveDays} ngày
             </span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-gradient-to-br from-cyan-500/10 via-blue-500/5 to-transparent border border-cyan-500/20 dark:border-cyan-500/25 flex items-center gap-3 shadow-xs">
-          <div className="p-2.5 rounded-xl bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 shrink-0">
-            <Sparkles className="w-4 h-4" />
+        <div className="p-2.5 rounded-xs bg-theme-subtle/50 border border-theme-border flex items-center gap-2.5">
+          <div className="p-2 rounded-xs bg-theme-surface text-theme-muted shrink-0 border border-theme-border">
+            <Sparkles className="w-3.5 h-3.5" />
           </div>
           <div className="truncate">
-            <span className="text-[10px] text-cyan-600/80 dark:text-cyan-400/80 font-bold uppercase tracking-wider block">
-              Kỷ lục ngày cao nhất
+            <span className="text-[10px] text-theme-muted font-mono uppercase tracking-wider block">
+              Kỷ lục ngày
             </span>
-            <span className="text-sm sm:text-base font-black text-cyan-700 dark:text-cyan-300 truncate block">
-              {stats.maxDayCount} bài / ngày ✨
+            <span className="text-sm font-serif font-bold text-theme-text truncate block">
+              {stats.maxDayCount} bài / ngày
             </span>
           </div>
         </div>
@@ -512,56 +506,56 @@ export const StudyHeatmap: React.FC<StudyHeatmapProps> = ({
       </div>
 
       {/* Footer Info: Tooltip chi tiết ngày & Legend Chú giải */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 relative z-10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-theme-border text-[11px] text-theme-muted relative z-10 font-mono">
         <div className="flex items-center gap-2 min-h-[28px]">
           {hoveredDay ? (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-sm animate-fade-in font-medium">
-              <span className="font-bold text-slate-900 dark:text-white">
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded-xs bg-theme-subtle text-theme-text border border-theme-border shadow-xs animate-fade-in font-medium">
+              <span className="font-bold text-theme-text font-serif">
                 {hoveredDay.dayOfWeekName}, {new Date(hoveredDay.dateStr).toLocaleDateString('vi-VN')}
               </span>
               <span>•</span>
               {hoveredDay.isFuture ? (
-                <span className="text-slate-400">(Ngày tương lai)</span>
+                <span className="text-theme-muted">(Ngày tương lai)</span>
               ) : hoveredDay.count > 0 ? (
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                  🔥 {hoveredDay.count} hoạt động học tập
+                <span className="text-theme-accent font-bold flex items-center gap-1">
+                  {hoveredDay.count} hoạt động
                 </span>
               ) : (
-                <span className="text-slate-400">Chưa có hoạt động học</span>
+                <span className="text-theme-muted">Chưa có hoạt động</span>
               )}
             </div>
           ) : (
-            <span className="flex items-center gap-1.5 text-slate-400">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-              <span>Rê chuột hoặc chạm vào ô vuông để xem chi tiết hoạt động từng ngày</span>
+            <span className="flex items-center gap-1.5 text-theme-muted">
+              <CheckCircle2 className="w-3.5 h-3.5 text-theme-success shrink-0" />
+              <span>Chạm vào ô để xem chi tiết hoạt động</span>
             </span>
           )}
         </div>
 
-        {/* Chú giải cấp độ màu GitHub Pro */}
-        <div className="flex items-center gap-2 self-end sm:self-auto font-medium text-xs">
-          <span className="text-[11px] text-slate-400">Ít</span>
+        {/* Chú giải cấp độ màu 5 bậc Semantic Heatmap */}
+        <div className="flex items-center gap-1.5 self-end sm:self-auto font-medium text-xs">
+          <span className="text-[10px] text-theme-muted">Ít</span>
           <div
-            className="w-3.5 h-3.5 rounded-md bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50"
+            className="w-3 h-3 rounded-xs bg-heatmap-0 border border-theme-border/60"
             title="0 hoạt động"
           />
           <div
-            className="w-3.5 h-3.5 rounded-md bg-[#0e4429] border border-[#1b6a38]"
+            className="w-3 h-3 rounded-xs bg-heatmap-1 border border-heatmap-2"
             title="1 - 2 hoạt động"
           />
           <div
-            className="w-3.5 h-3.5 rounded-md bg-[#006d32] border border-[#26a641]"
+            className="w-3 h-3 rounded-xs bg-heatmap-2 border border-heatmap-3"
             title="3 - 5 hoạt động"
           />
           <div
-            className="w-3.5 h-3.5 rounded-md bg-[#26a641] border border-[#39d353]"
+            className="w-3 h-3 rounded-xs bg-heatmap-3 border border-heatmap-4"
             title="6 - 8 hoạt động"
           />
           <div
-            className="w-3.5 h-3.5 rounded-md bg-[#39d353] border border-[#7ee787]"
+            className="w-3 h-3 rounded-xs bg-heatmap-4 border border-theme-border-strong"
             title="9+ hoạt động"
           />
-          <span className="text-[11px] text-slate-400">Nhiều</span>
+          <span className="text-[10px] text-theme-muted">Nhiều</span>
         </div>
       </div>
     </div>

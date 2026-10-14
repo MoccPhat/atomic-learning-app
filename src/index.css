@@ -3,20 +3,88 @@
 @tailwind utilities;
 
 :root {
-  --app-bg: #f8fafc;
-  --app-fg: #0f172a;
+  --app-bg: #F4EFE6;
+  --app-fg: #1F1B16;
   --app-gradient: none;
-  --brand-50: #f0fdf4;
-  --brand-100: #dcfce7;
-  --brand-500: #22c55e;
-  --brand-600: #16a34a;
-  --brand-700: #15803d;
+  --brand-50: #FAF7F2;
+  --brand-100: #EAE3D5;
+  --brand-500: #C4452D;
+  --brand-600: #AB3A24;
+  --brand-700: #8E2F1B;
+
+  /* Semantic Theme Tokens - Light Mode (Warm Paper) */
+  --theme-bg: #F4EFE6;
+  --theme-surface: #FAF7F2;
+  --theme-subtle: #EAE3D5;
+  --theme-border: #D8D0C5;
+  --theme-border-strong: #1F1B16;
+  --theme-text: #1F1B16;
+  --theme-text-muted: #686259;
+  --theme-accent: #C4452D;
+  --theme-accent-hover: #A93B26;
+  --theme-success: #4A6B4F;
+  --theme-warning: #C4452D;
+
+  /* Semantic Heatmap 5 Levels - Light */
+  --heatmap-0: #EAE3D5;
+  --heatmap-1: #D6E2D8;
+  --heatmap-2: #9FBF9E;
+  --heatmap-3: #679366;
+  --heatmap-4: #4A6B4F;
 }
 
 html.dark {
-  --app-bg: #090d16;
-  --app-fg: #ffffff;
+  --app-bg: #1C1A17;
+  --app-fg: #E9E2D3;
   --app-gradient: none;
+  --brand-50: #26231F;
+  --brand-100: #302C26;
+  --brand-500: #C4452D;
+  --brand-600: #AB3A24;
+  --brand-700: #8E2F1B;
+
+  /* Semantic Theme Tokens - Dark Mode (Warm Charcoal) */
+  --theme-bg: #1C1A17;
+  --theme-surface: #26231F;
+  --theme-subtle: #302C26;
+  --theme-border: #38342E;
+  --theme-border-strong: #E9E2D3;
+  --theme-text: #E9E2D3;
+  --theme-text-muted: #9E9689;
+  --theme-accent: #C4452D;
+  --theme-accent-hover: #D65239;
+  --theme-success: #5E8464;
+  --theme-warning: #E0883A;
+
+  /* Semantic Heatmap 5 Levels - Dark */
+  --heatmap-0: #26231F;
+  --heatmap-1: #2E4032;
+  --heatmap-2: #3D5943;
+  --heatmap-3: #4D7254;
+  --heatmap-4: #5E8464;
+}
+
+/* Paper Desk Utilities */
+.paper-ruled {
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 27px,
+    rgba(216, 208, 197, 0.45) 28px
+  );
+}
+html.dark .paper-ruled {
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 27px,
+    rgba(61, 56, 48, 0.5) 28px
+  );
+}
+
+.paper-shadow {
+  box-shadow: 2px 2px 0px rgba(31, 27, 22, 0.08);
+}
+html.dark .paper-shadow {
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.4);
 }
 
 [data-accent="emerald"] {

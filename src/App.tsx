@@ -11,6 +11,7 @@ import { QuickCaptureModal } from './components/QuickCaptureModal';
 import { SettingsModal } from './components/SettingsModal';
 import { DeleteCategoryModal } from './components/categories/DeleteCategoryModal';
 import { Sidebar } from './components/Sidebar';
+import { TopNavBar } from './components/navigation/TopNavBar';
 import { QuizMaster } from './components/quiz/QuizMaster';
 import { TreeExplorer } from './components/tree/TreeExplorer';
 import { TreeData } from './lib/tree-types';
@@ -35,6 +36,22 @@ import { MobileBottomNav } from './components/navigation/MobileBottomNav';
 import { FeedbackModal } from './components/feedback/FeedbackModal';
 import { addQuizSetFromText } from './lib/quiz-storage';
 import { MistakeItem } from './lib/mistakes-types';
+import { StudyHeatmap } from './components/analytics/StudyHeatmap';
+import { DeadlineManager } from './components/deadlines/DeadlineManager';
+
+export type AppTab =
+  | 'cards'
+  | 'tree'
+  | 'heatmap'
+  | 'deadlines'
+  | 'quiz'
+  | 'pomodoro'
+  | 'scanner'
+  | 'cornell'
+  | 'advisor'
+  | 'feynman'
+  | 'cheatsheet'
+  | 'mindmap';
 
 export default function App() {
   const [cards, setCards] = useState<Card[]>([]);
@@ -58,24 +75,20 @@ export default function App() {
   const [cardGenInitialText, setCardGenInitialText] = useState('');
   const [cardGenDocTitle, setCardGenDocTitle] = useState('');
   const [globalToast, setGlobalToast] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const showGlobalToast = (message: string) => {
     setGlobalToast(message);
     setTimeout(() => setGlobalToast(null), 3500);
   };
 
-  // Tab đang hoạt động: 'cards', 'quiz', 'tree', 'pomodoro', 'scanner', 'cornell', 'advisor', 'feynman', 'cheatsheet', 'mindmap'
-  const [activeTab, setActiveTab] = useState<'cards' | 'quiz' | 'tree' | 'pomodoro' | 'scanner' | 'cornell' | 'advisor' | 'feynman' | 'cheatsheet' | 'mindmap'>('cards');
+  // Tab đang hoạt động: AppTab
+  const [activeTab, setActiveTab] = useState<AppTab>('cards');
   const [quizCount, setQuizCount] = useState<number>(() => loadQuizSets().length);
   const [treeData, setTreeData] = useState<TreeData>({ groups: [] });
   
-  // Trạng thái Menu bên trái: mặc định mở trên màn hình lớn (>= 1024px) và đóng trên mobile
-  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth >= 1024;
-    }
-    return false;
-  });
+  // Trạng thái Menu bên trái: mặc định đóng, có thể mở khi cần (nhấn phím [ hoặc bấm nút menu)
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   // Danh mục đang chọn (Tất cả, Lập trình, Ngoại ngữ, Đọc sách, Ôn thi cử)
   const [selectedCategory, setSelectedCategory] = useState<Category | 'all'>('all');
@@ -260,8 +273,8 @@ export default function App() {
           }}
         />
       ) : (
-        <div className="flex min-h-screen w-full max-w-full overflow-x-hidden">
-          {/* Thanh Menu bên trái có thể Ẩn / Hiện */}
+        <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#F8FAFB] dark:bg-[#0F172A] text-slate-900 dark:text-slate-100 flex font-sans transition-colors">
+          {/* Thanh Menu bên trái cố định Learnly Style */}
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
@@ -292,49 +305,124 @@ export default function App() {
             onOpenFeedback={() => setIsFeedbackOpen(true)}
           />
 
-          {/* Vùng nội dung chính */}
-          <main
-            className={`flex-1 min-w-0 max-w-full overflow-x-hidden transition-all duration-300 ease-in-out pb-24 lg:pb-8 ${
-              isSidebarOpen ? 'lg:pl-72' : 'lg:pl-0'
-            }`}
-          >
-            {activeTab === 'cards' ? (
-              <Dashboard
-                cards={cards}
-                stats={stats}
-                selectedCategory={selectedCategory}
-                onSelectCategory={setSelectedCategory}
-                isSidebarOpen={isSidebarOpen}
-                onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-                onStartReview={handleStartReview}
-                onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
-                onOpenSettings={() => setIsSettingsOpen(true)}
-                onCardDeleted={() => reloadData()}
-                treeData={treeData}
-                onActivityLogged={() => reloadData()}
-                onOpenPomodoro={() => setActiveTab('pomodoro')}
-                onOpenDeleteCategory={() => setIsDeleteCategoryOpen(true)}
-                onOpenScanner={() => setActiveTab('scanner')}
-                onOpenCornell={() => setActiveTab('cornell')}
-                onOpenAdvisor={() => setActiveTab('advisor')}
-                onOpenAchievements={() => setIsAchievementsOpen(true)}
-                onOpenMindmap={() => setActiveTab('mindmap')}
-                onOpenMistakes={() => setIsMistakesOpen(true)}
-                onOpenCardGenerator={() => {
-                  setCardGenInitialText('');
-                  setCardGenDocTitle('');
-                  setIsCardGeneratorOpen(true);
-                }}
-                onOpenAudioFlashcard={() => setIsAudioFlashcardOpen(true)}
-                onOpenFeedback={() => setIsFeedbackOpen(true)}
-              />
+          {/* Cột bên phải: TopNavBar + Vùng nội dung chính */}
+          <div className="flex-1 flex flex-col min-w-0 max-w-full lg:pl-64 transition-all duration-300 ease-in-out">
+            <TopNavBar
+              activeTab={activeTab}
+              onSelectTab={(tab) => {
+                setActiveTab(tab);
+                reloadData();
+              }}
+              streak={stats.streak}
+              dueCount={dueCards.length}
+              quizCount={quizCount}
+              onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
+              onOpenSettings={() => setIsSettingsOpen(true)}
+              onOpenAchievements={() => setIsAchievementsOpen(true)}
+              onOpenMistakes={() => setIsMistakesOpen(true)}
+              onOpenCardGenerator={() => {
+                setCardGenInitialText('');
+                setCardGenDocTitle('');
+                setIsCardGeneratorOpen(true);
+              }}
+              onOpenAudioFlashcard={() => setIsAudioFlashcardOpen(true)}
+              onOpenDeadlines={() => {
+                setActiveTab('deadlines');
+                reloadData();
+              }}
+              onOpenScanner={() => {
+                setActiveTab('scanner');
+                reloadData();
+              }}
+              onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
+
+            {/* Vùng nội dung chính */}
+            <main className="flex-1 min-w-0 max-w-full overflow-x-hidden pb-24 lg:pb-8">
+              {activeTab === 'cards' ? (
+                <Dashboard
+                  cards={cards}
+                  stats={stats}
+                  selectedCategory={selectedCategory}
+                  onSelectCategory={setSelectedCategory}
+                  isSidebarOpen={isSidebarOpen}
+                  onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+                  onStartReview={handleStartReview}
+                  onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
+                  onOpenSettings={() => setIsSettingsOpen(true)}
+                  onCardDeleted={() => reloadData()}
+                  treeData={treeData}
+                  onActivityLogged={() => reloadData()}
+                  onOpenPomodoro={() => setActiveTab('pomodoro')}
+                  onOpenDeadlines={() => setActiveTab('deadlines')}
+                  onOpenHeatmap={() => setActiveTab('heatmap')}
+                  onOpenQuiz={() => setActiveTab('quiz')}
+                  onOpenFeynman={() => setActiveTab('feynman')}
+                  onOpenCheatSheet={() => setActiveTab('cheatsheet')}
+                  onOpenDeleteCategory={() => setIsDeleteCategoryOpen(true)}
+                  onOpenScanner={() => setActiveTab('scanner')}
+                  onOpenCornell={() => setActiveTab('cornell')}
+                  onOpenAdvisor={() => setActiveTab('advisor')}
+                  onOpenAchievements={() => setIsAchievementsOpen(true)}
+                  onOpenMindmap={() => setActiveTab('mindmap')}
+                  onOpenMistakes={() => setIsMistakesOpen(true)}
+                  onOpenCardGenerator={() => {
+                    setCardGenInitialText('');
+                    setCardGenDocTitle('');
+                    setIsCardGeneratorOpen(true);
+                  }}
+                  onOpenAudioFlashcard={() => setIsAudioFlashcardOpen(true)}
+                  onOpenFeedback={() => setIsFeedbackOpen(true)}
+                  searchQuery={searchQuery}
+                />
+            ) : activeTab === 'deadlines' ? (
+              <div className="w-full">
+                <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
+                  <button
+                    onClick={() => setIsSidebarOpen((prev) => !prev)}
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs lg:hidden"
+                    title="Ẩn / Hiện menu danh mục"
+                  >
+                    <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Menu</span>
+                  </button>
+                </div>
+                <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                  <DeadlineManager
+                    treeData={treeData}
+                    onActivityLogged={() => reloadData()}
+                  />
+                </div>
+              </div>
+            ) : activeTab === 'heatmap' ? (
+              <div className="w-full">
+                <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
+                  <button
+                    onClick={() => setIsSidebarOpen((prev) => !prev)}
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs lg:hidden"
+                    title="Ẩn / Hiện menu danh mục"
+                  >
+                    <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">Menu</span>
+                  </button>
+                </div>
+                <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                  <StudyHeatmap
+                    historyMap={stats.historyMap}
+                    streak={stats.streak}
+                    onActivityLogged={() => reloadData()}
+                  />
+                </div>
+              </div>
             ) : activeTab === 'quiz' ? (
               <div className="w-full">
                 {/* Header thanh công cụ mở menu cho Quiz Master */}
                 <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
                   <button
                     onClick={() => setIsSidebarOpen((prev) => !prev)}
-                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs lg:hidden"
                     title="Ẩn / Hiện menu danh mục"
                   >
                     <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
@@ -349,7 +437,7 @@ export default function App() {
                 <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
                   <button
                     onClick={() => setIsSidebarOpen((prev) => !prev)}
-                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs lg:hidden"
                     title="Ẩn / Hiện menu danh mục"
                   >
                     <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
@@ -374,7 +462,7 @@ export default function App() {
                 <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
                   <button
                     onClick={() => setIsSidebarOpen((prev) => !prev)}
-                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs lg:hidden"
                     title="Ẩn / Hiện menu danh mục"
                   >
                     <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
@@ -407,7 +495,7 @@ export default function App() {
                 <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
                   <button
                     onClick={() => setIsSidebarOpen((prev) => !prev)}
-                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs lg:hidden"
                     title="Ẩn / Hiện menu danh mục"
                   >
                     <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
@@ -433,7 +521,7 @@ export default function App() {
                 <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-0 flex items-center justify-between">
                   <button
                     onClick={() => setIsSidebarOpen((prev) => !prev)}
-                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+                    className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/70 dark:hover:bg-slate-800 active:scale-95 transition-all flex items-center gap-2 border border-slate-200/80 dark:border-slate-700 shadow-xs lg:hidden"
                     title="Ẩn / Hiện menu danh mục"
                   >
                     <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
@@ -466,7 +554,7 @@ export default function App() {
                   onCardsAdded={() => reloadData()}
                 />
               </div>
-            ) : (
+            ) : activeTab === 'feynman' ? (
               <div className="w-full">
                 <FeynmanStudio
                   onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
@@ -477,21 +565,60 @@ export default function App() {
                   onCardsAdded={() => reloadData()}
                 />
               </div>
+            ) : (
+              <div className="w-full">
+                <Dashboard
+                  cards={cards}
+                  stats={stats}
+                  selectedCategory={selectedCategory}
+                  onSelectCategory={setSelectedCategory}
+                  isSidebarOpen={isSidebarOpen}
+                  onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+                  onStartReview={handleStartReview}
+                  onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
+                  onOpenSettings={() => setIsSettingsOpen(true)}
+                  onCardDeleted={() => reloadData()}
+                  treeData={treeData}
+                  onActivityLogged={() => reloadData()}
+                  onOpenPomodoro={() => setActiveTab('pomodoro')}
+                  onOpenDeadlines={() => setActiveTab('deadlines')}
+                  onOpenHeatmap={() => setActiveTab('heatmap')}
+                  onOpenQuiz={() => setActiveTab('quiz')}
+                  onOpenFeynman={() => setActiveTab('feynman')}
+                  onOpenCheatSheet={() => setActiveTab('cheatsheet')}
+                  onOpenDeleteCategory={() => setIsDeleteCategoryOpen(true)}
+                  onOpenScanner={() => setActiveTab('scanner')}
+                  onOpenCornell={() => setActiveTab('cornell')}
+                  onOpenAdvisor={() => setActiveTab('advisor')}
+                  onOpenAchievements={() => setIsAchievementsOpen(true)}
+                  onOpenMindmap={() => setActiveTab('mindmap')}
+                  onOpenMistakes={() => setIsMistakesOpen(true)}
+                  onOpenCardGenerator={() => {
+                    setCardGenInitialText('');
+                    setCardGenDocTitle('');
+                    setIsCardGeneratorOpen(true);
+                  }}
+                  onOpenAudioFlashcard={() => setIsAudioFlashcardOpen(true)}
+                  onOpenFeedback={() => setIsFeedbackOpen(true)}
+                  searchQuery={searchQuery}
+                />
+              </div>
             )}
           </main>
 
-          {/* Thanh điều hướng cố định dưới đáy màn hình trên Mobile */}
-          <MobileBottomNav
-            activeTab={activeTab}
-            onSelectTab={(tab) => {
-              setActiveTab(tab);
-              reloadData();
-            }}
-            onOpenMenu={() => setIsSidebarOpen(true)}
-            dueCount={dueCards.length}
-            quizCount={quizCount}
-            onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
-          />
+            {/* Thanh điều hướng cố định dưới đáy màn hình trên Mobile */}
+            <MobileBottomNav
+              activeTab={activeTab}
+              onSelectTab={(tab) => {
+                setActiveTab(tab);
+                reloadData();
+              }}
+              onOpenMenu={() => setIsSidebarOpen(true)}
+              dueCount={dueCards.length}
+              quizCount={quizCount}
+              onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
+            />
+          </div>
         </div>
       )}
 

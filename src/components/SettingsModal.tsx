@@ -256,93 +256,84 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in">
-      <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden text-left max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-theme-border-strong/70 backdrop-blur-xs animate-fade-in font-sans">
+      <div className="w-full max-w-2xl bg-theme-surface rounded-xs shadow-[4px_4px_0px_var(--theme-border-strong)] border-2 border-theme-border-strong overflow-hidden text-left max-h-[92vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/70">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-theme-border bg-theme-surface">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-brand-100 dark:bg-brand-950 text-brand-600 dark:text-brand-400">
-              <Palette className="w-5 h-5" />
+            <div className="p-2 rounded-xs bg-theme-accent text-white">
+              <Palette className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base">
-                Appearance & Cài đặt
+              <h3 className="font-serif font-bold text-theme-text text-base">
+                Cài đặt & Giao diện
               </h3>
-              <p className="text-xs text-slate-400 dark:text-slate-500">
-                Configure the agent's visual theme and display preferences.
+              <p className="text-xs text-theme-muted">
+                Tùy chỉnh chế độ hiển thị Sáng, Tối và cấu hình hệ thống.
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-xs text-theme-muted hover:text-theme-text transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 px-6 pt-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-900/40">
+        <div className="flex items-center gap-2 px-6 pt-3 border-b border-theme-border bg-theme-subtle/30 font-serif">
           <button
             onClick={() => setActiveTab('appearance')}
             className={`pb-2.5 px-3 text-xs font-bold transition-all relative flex items-center gap-2 ${
               activeTab === 'appearance'
-                ? 'text-brand-600 dark:text-brand-400'
-                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                ? 'text-theme-accent border-b-2 border-theme-accent'
+                : 'text-theme-muted hover:text-theme-text'
             }`}
           >
             <Palette className="w-4 h-4" />
-            <span>Giao diện & Màu sắc</span>
-            {activeTab === 'appearance' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-500 rounded-full" />
-            )}
+            <span>Giao diện & Chủ đề</span>
           </button>
 
           <button
             onClick={() => setActiveTab('ai')}
             className={`pb-2.5 px-3 text-xs font-bold transition-all relative flex items-center gap-2 ${
               activeTab === 'ai'
-                ? 'text-brand-600 dark:text-brand-400'
-                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                ? 'text-theme-accent border-b-2 border-theme-accent'
+                : 'text-theme-muted hover:text-theme-text'
             }`}
           >
             <Zap className="w-4 h-4" />
             <span>AI Vision Scanner</span>
-            {activeTab === 'ai' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-500 rounded-full" />
-            )}
           </button>
 
           <button
             onClick={() => setActiveTab('data')}
             className={`pb-2.5 px-3 text-xs font-bold transition-all relative flex items-center gap-2 ${
               activeTab === 'data'
-                ? 'text-brand-600 dark:text-brand-400'
-                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                ? 'text-theme-accent border-b-2 border-theme-accent'
+                : 'text-theme-muted hover:text-theme-text'
             }`}
           >
             <Database className="w-4 h-4" />
             <span>Dữ liệu & Sao lưu</span>
-            {activeTab === 'data' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-500 rounded-full" />
-            )}
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 space-y-6 overflow-y-auto flex-1">
+        <div className="p-6 space-y-6 overflow-y-auto flex-1 font-sans">
           {message && (
             <div
-              className={`p-3.5 rounded-2xl flex items-center gap-2.5 text-xs font-bold animate-fade-in ${
+              className={`p-3.5 rounded-xs flex items-center gap-2.5 text-xs font-mono animate-fade-in ${
                 message.type === 'success'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                  : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+                  ? 'bg-theme-success/15 text-theme-success border border-theme-success/40'
+                  : 'bg-theme-warning/15 text-theme-warning border border-theme-warning/40'
               }`}
             >
               {message.type === 'success' ? (
-                <Check className="w-4 h-4 shrink-0 text-emerald-500" />
+                <Check className="w-4 h-4 shrink-0 text-theme-success" />
               ) : (
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                <AlertCircle className="w-4 h-4 shrink-0 text-theme-warning" />
               )}
               <span>{message.text}</span>
             </div>
@@ -350,52 +341,59 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
 
           {activeTab === 'appearance' && (
             <div className="space-y-6">
-              {/* SECTION 1: APPEARANCE (THEME & CONTRAST) */}
+              {/* SECTION 1: THEME SELECTOR (SÁNG / TỐI / HỆ THỐNG) */}
               <div className="space-y-3">
-                <span className="text-xs font-black text-slate-800 dark:text-slate-200 tracking-wide uppercase">
-                  Appearance
+                <span className="text-xs font-mono text-theme-muted tracking-wider uppercase block">
+                  Chế độ hiển thị chính
                 </span>
 
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
-                  {/* Theme Mode Toggle (Segmented Control) */}
-                  <div className="flex items-center justify-between p-3.5">
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Theme</span>
-                    <div className="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700/60">
+                <div className="rounded-xs border border-theme-border bg-theme-surface divide-y divide-theme-border shadow-xs">
+                  {/* Theme Mode Toggle (3 options with text labels) */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3">
+                    <div>
+                      <span className="text-xs font-serif font-bold text-theme-text block">Chủ đề giao diện</span>
+                      <span className="text-[11px] text-theme-muted block">Chọn Sáng, Tối hoặc Tự động theo máy tính</span>
+                    </div>
+
+                    <div className="inline-flex p-1 rounded-xs bg-theme-subtle border border-theme-border font-mono text-xs">
                       <button
                         type="button"
                         onClick={() => handleModeChange('system')}
-                        className={`p-2 rounded-lg transition-all ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xs transition-all ${
                           theme.mode === 'system'
-                            ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-xs'
-                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                            ? 'bg-theme-surface text-theme-accent font-bold shadow-xs'
+                            : 'text-theme-muted hover:text-theme-text'
                         }`}
                         title="Tự động theo hệ thống (Windows / Mobile)"
                       >
-                        <Laptop className="w-4 h-4" />
+                        <Laptop className="w-3.5 h-3.5" />
+                        <span>Hệ thống</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleModeChange('light')}
-                        className={`p-2 rounded-lg transition-all ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xs transition-all ${
                           theme.mode === 'light'
-                            ? 'bg-white dark:bg-slate-900 text-amber-500 shadow-xs'
-                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                            ? 'bg-theme-surface text-theme-accent font-bold shadow-xs'
+                            : 'text-theme-muted hover:text-theme-text'
                         }`}
-                        title="Giao diện Sáng (Light Theme)"
+                        title="Giao diện Sáng (Warm Paper)"
                       >
-                        <Sun className="w-4 h-4" />
+                        <Sun className="w-3.5 h-3.5" />
+                        <span>Sáng</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleModeChange('dark')}
-                        className={`p-2 rounded-lg transition-all ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xs transition-all ${
                           theme.mode === 'dark'
-                            ? 'bg-white dark:bg-slate-900 text-indigo-400 shadow-xs'
-                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                            ? 'bg-theme-surface text-theme-accent font-bold shadow-xs'
+                            : 'text-theme-muted hover:text-theme-text'
                         }`}
-                        title="Giao diện Tối (Dark Theme)"
+                        title="Giao diện Tối (Warm Charcoal)"
                       >
-                        <Moon className="w-4 h-4" />
+                        <Moon className="w-3.5 h-3.5" />
+                        <span>Tối</span>
                       </button>
                     </div>
                   </div>
